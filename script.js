@@ -3,7 +3,7 @@ const menuToggle = document.getElementById('menu-toggle');
 
 let finish = "finish";
 let timeIncrement = 10;
-let timer = document.getElementById("timer");
+let timer = document.getElementById("timer-container");
 let intervalTimeDisplay = document.getElementById("intervalTime");
 let totalTimeDisplay = document.getElementById("totalTime");
 
