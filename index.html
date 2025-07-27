@@ -1,2 +1,61 @@
-<h1></h1>Hellow Workd</h1>
-<p>This is an experiment</p>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <header class="header">
+            <nav class="navbar">
+                <input type="checkbox" id="menu-toggle" class="menu-toggle">
+                <label for="menu-toggle" class="hamburger-icon">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </label>
+                <ul class="nav-menu">
+                    <li><a href="#" class="nav-link" onClick="showRoutines();">Routines</a></li>
+                    <li><a href="#" class="nav-link" onClick="createRoutine();">Create</a></li>
+                    <li><a href="#" class="nav-link" onClick="importRoutines();">Import</a></li>
+                    <li><a href="#" class="nav-link" onClick="exportRoutines();">Export</a></li>
+                </ul>
+            </nav>
+        </header>
+        <div id="routine-container" style="display:none;" >
+            <form id="newRoutineForm">
+                <div class="input-group">
+                    <br/>
+                    <br/>
+                    <input type="text" id="routineId" hidden/>
+                    <label for="newRoutineName">Routine name: </label><input type="text" id="newRoutineName" required oninvalid="this.setCustomValidity('Please enter a name for your routine.')"
+                       oninput="this.setCustomValidity('')"/>
+                    <br/><br/>
+                    <label for="numberOfRounds">No of rounds: </label><input type="number" min="1" max="99" value="1" id="numberOfRounds" required oninvalid="setCustomValidity('You must have at least one round')" oninput="this.setCustomValidity('')"/>
+                </div>
+                <br/>	
+                <div id="sets">
+                </div>
+            </form>
+            <button onclick="addSet();" class="button">Add Set</button>
+            <div class="buttons">
+                <button class="button" onclick="saveRoutine();">Save</button>
+                <button class="button" onclick="cancelRoutine();">Cancel</button>
+            </div>
+        </div>
+        <div id="routines-container">
+        </div>
+        <div class="timer-container" id="timer-container" style="display:none;">
+            <h1 id="routineName">Routine</h1>
+            <h2 id="setName" class="interval-name">&nbsp;</h2>
+            <div id="timer" class="timer-display">
+                <p id="intervalTime" class="interval-name">00:00</p>
+                <p id="totalTime" class="total-time">00:00</p>
+            </div>
+            <div class="buttons">
+                <button class="button" onclick="startTimer();">Start</button>
+                <button class="button" onclick="stopTimer();">Stop</button>
+            </div>
+        </div>
+         <script src="script.js"></script>  
+    </body>
+</html>
