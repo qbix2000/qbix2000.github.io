@@ -246,9 +246,9 @@ let routines = [
             },
             {"setName": "Hold tension",
              "intervals": [
-                 {"duration": 5,
+                 {"duration": 30,
                   "type": "active"},
-                 {"duration": 2,
+                 {"duration": 26,
                   "type": "rest"}
              ]
             }
@@ -269,9 +269,9 @@ let routines = [
             },
             {"setName": "Hold tension",
              "intervals": [
-                 {"duration": 5,
+                 {"duration": 6,
                   "type": "active"},
-                 {"duration": 2,
+                 {"duration": 20,
                   "type": "rest"}
              ]
             }
