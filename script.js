@@ -335,6 +335,7 @@ function loadSelectedRoutine(routineNumber) {
     document.getElementById("timer-container").style.display = "flex";
     menuToggle.checked = false;
     document.getElementById("routineName").textContent = routine.title;
+    document.getElementById("setName").textContent = "";
     totalNumberOfRounds = routine.rounds;
     intervalTimeDisplay.textContent = "00:00";
     totalTimeDisplay.textContent = "00:00";
