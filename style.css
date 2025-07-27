@@ -1,0 +1,262 @@
+:root {
+    /* Light Mode Colors (Default) */
+    --background-color: #ffffff; /* White */
+    --text-color: #202124;       /* Dark Gray (Google's almost black) */
+    --primary-color: #4285f4;    /* Google Blue */
+    --accent-color: #34a853;     /* Google Green */
+    --warning-color: #fbbc05;    /* Google Yellow */
+    --danger-color: #ea4335;     /* Google Red */
+    --border-color: #dadce0;     /* Light Gray */
+    --card-background: #f8f9fa;  /* Off-white for cards/sections */
+    --shadow-color: rgba(0, 0, 0, 0.1); /* Light shadow */
+}
+/* Dark Mode Colors - Applied when user prefers dark scheme */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background-color: #202124; /* Dark Gray (Google's almost black) */
+        --text-color: #e8eaed;       /* Light Gray */
+        --primary-color: #8ab4f8;    /* Lighter Google Blue */
+        --accent-color: #81c995;     /* Lighter Google Green */
+        --warning-color: #fdd663;    /* Lighter Google Yellow */
+        --danger-color: #f28b82;     /* Lighter Google Red */
+        --border-color: #5f6368;     /* Medium Gray */
+        --card-background: #303134;  /* Slightly lighter dark gray for cards */
+        --shadow-color: rgba(0, 0, 0, 0.4); /* Darker shadow for depth */
+    }
+}
+/* Base Body Styles */
+body {
+    font-family: 'Inter', sans-serif; /* Using Inter as specified */
+    background-color: var(--background-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* Full viewport height */
+    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth theme transition */
+    box-sizing: border-box;
+}
+.menu {
+    position: absolute;
+    margin-block-start: 0.1em;
+    left: 0.1em;
+    top: 0em;
+}
+/* Container for the timer application */
+.timer-container {
+    padding: 20px;
+    margin: 10px;
+    width: 90%; /* A bit wider on very small screens */
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    height: 90vh;
+}
+/* Timer Display */
+.timer-display {
+    font-size: 4em; /* Large font for the timer */
+    font-weight: bold;
+    margin-bottom: 30px;
+    color: var(--primary-color); /* Highlight timer with primary color */
+    letter-spacing: 2px;
+    height: 95%;
+    text-align: center;
+    align-items: center;
+    width: 70%;
+}
+.timer-display .total-time {
+    font-size: clamp(40px, 5vw, 100px);;
+    position: absolute;
+    bottom: 2em;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+}
+/* Current Interval/Phase Name */
+.interval-name {
+    font-size: 1.5em;
+    margin-bottom: 20px;
+    color: var(--text-color);
+}
+/* Buttons */
+.button {
+    background-color: var(--primary-color);
+    color: #ffffff; /* White text on buttons */
+    border: none;
+    border-radius: 8px;
+    padding: 12px 25px;
+    font-size: 1.1em;
+    cursor: pointer;
+    margin: 10px 5px;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    box-shadow: 0 2px 5px var(--shadow-color);
+}
+.button:hover {
+    background-color: color-mix(in srgb, var(--primary-color) 85%, black); /* Slightly darker on hover */
+    transform: translateY(-2px);
+}
+.button:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px var(--shadow-color);
+}
+/* Specific button styles */
+.button.start {
+    background-color: var(--accent-color);
+}
+.button.start:hover {
+    background-color: color-mix(in srgb, var(--accent-color) 85%, black);
+}
+.button.pause {
+    background-color: var(--warning-color);
+    color: var(--text-color); /* Dark text for warning button */
+}
+.button.pause:hover {
+    background-color: color-mix(in srgb, var(--warning-color) 85%, black);
+}
+.button.reset {
+    background-color: var(--danger-color);
+}
+.button.reset:hover {
+    background-color: color-mix(in srgb, var(--danger-color) 85%, black);
+}
+/* Input fields (if any for setting intervals) */
+.input-group {
+    margin-bottom: 20px;
+}
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: var(--text-color);
+}
+.input-group input[type="number"],
+.input-group input[type="text"] {
+    width: calc(100% - 20px); /* Account for padding */
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--background-color); /* Input background matches body */
+    color: var(--text-color);
+    font-size: 1em;
+    transition: border-color 0.2s ease;
+}
+.input-group input[type="number"]:focus,
+.input-group input[type="text"]:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 20%, transparent);
+}
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .timer-display {
+        font-size: 3em;
+    }
+    .interval-name {
+        font-size: 1.2em;
+    }
+    .button {
+        /* width: calc(100% - 10px); /* Full width buttons on small screens */
+        margin: 5px 0;
+    }
+    .timer-container {
+        padding: 20px;
+        margin: 10px;
+    }
+}
+
+.header {
+    width: 100%;
+    background-color: var(--card-background);
+    padding: 10px 20px;
+    box-shadow: 0 2px 10px var(--shadow-color);
+    position: fixed; /* Fix header to the top */
+    top: 0;
+    left: 0;
+    z-index: 1000; /* Ensure header is on top */
+    box-sizing: border-box;
+}
+
+.navbar {
+    display: flex;
+    justify-content: flex-start; /* Changed to flex-start to align hamburger to the left */
+    align-items: center;
+    max-width: 1200px; /* Optional: constrain width of navbar content */
+}
+
+.menu-toggle {
+    display: none; /* Hide the checkbox */
+}
+
+.hamburger-icon {
+    display: flex; /* Ensure the icon is always displayed */
+    flex-direction: column;
+    justify-content: space-around;
+    width: 30px;
+    height: 25px;
+    cursor: pointer;
+    z-index: 1001; /* Ensure icon is above menu */
+}
+
+.hamburger-icon .bar {
+    width: 100%;
+    height: 3px;
+    background-color: var(--text-color); /* Bars match text color */
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+/* Hamburger animation */
+.menu-toggle:checked + .hamburger-icon .bar:nth-child(1) {
+    transform: translateY(11px) rotate(45deg);
+}
+
+.menu-toggle:checked + .hamburger-icon .bar:nth-child(2) {
+    opacity: 0;
+}
+
+.menu-toggle:checked + .hamburger-icon .bar:nth-child(3) {
+    transform: translateY(-11px) rotate(-45deg);
+}
+
+.nav-menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column; /* Stack menu items vertically */
+    background-color: var(--card-background);
+    position: fixed; /* Position relative to the viewport */
+    top: 0;
+    left: -250px; /* Changed from right to left, starting off-screen */
+    width: 250px; /* Fixed width for the slide-out menu */
+    height: 100vh; /* Full viewport height */
+    box-shadow: 4px 0 10px var(--shadow-color); /* Changed shadow direction */
+    transition: left 0.3s ease-in-out; /* Changed transition property */
+    padding-top: 60px; /* Space for the fixed header */
+    box-sizing: border-box;
+    z-index: 999; /* Below hamburger icon, above timer */
+}
+
+/* Menu slide-in */
+.menu-toggle:checked ~ .nav-menu {
+    left: 0; /* Slide menu in from the left */
+}
+
+.nav-link {
+    display: block;
+    padding: 15px 20px;
+    text-decoration: none;
+    color: var(--text-color);
+    font-size: 1.1em;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    text-align: left;
+}
+
+.nav-link:hover {
+    background-color: var(--primary-color);
+    color: #ffffff;
+}  
