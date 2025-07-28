@@ -20,6 +20,7 @@
                     <li><a href="#" class="nav-link" onClick="createRoutine();">Create</a></li>
                     <li><a href="#" class="nav-link" onClick="importRoutines();">Import</a></li>
                     <li><a href="#" class="nav-link" onClick="exportRoutines();">Export</a></li>
+                    <li><a href="#" class="nav-link" onClick="showSettings();">Settings</a></li>
                 </ul>
             </nav>
         </header>
@@ -47,8 +48,8 @@
         <div id="routines-container">
         </div>
         <div class="timer-container" id="timer-container" style="display:none;">
-            <h1 id="routineName">Routine</h1>
-            <h2 id="setName" class="interval-name">&nbsp;</h2>
+            <h1 id="setName">&nbsp;</h1>
+            <h1 id="roundNumber">&nbsp;</h1>
             <div id="timer" class="timer-display">
                 <p id="intervalTime" class="interval-name">00:00</p>
                 <p id="totalTime" class="total-time">00:00</p>
@@ -56,6 +57,12 @@
             <div class="buttons">
                 <button class="button" onclick="startTimer();">Start</button>
                 <button class="button" onclick="stopTimer();">Stop</button>
+            </div>
+        </div>
+        <div id="settings-container" style="display:none;">
+            <h1>Settings</h1>
+            <div class="nav-link" onclick="clearLocalStorage();">
+                <h2>Clear local storage</h2>
             </div>
         </div>
          <script src="script.js"></script>  
