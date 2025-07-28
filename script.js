@@ -14,8 +14,6 @@ let setNumber = 0;
 function deleteSet(setNumber) {
     const setToDelete = document.getElementById("set" + setNumber);
 
-    alert(setToDelete);
-
     const parent = setToDelete.parentNode;
 
     parent.removeChild(setToDelete);
@@ -64,22 +62,46 @@ function cancelRoutine() {
 }
 
 function showRoutines() {
-    document.getElementById("routine-container").style.display = "none";
-    document.getElementById("timer-container").style.display = "none";
-    document.getElementById("routines-container").style.display = "block";
-    menuToggle.checked = false;
+    showContainer("routines-container");
     loadRoutines();
 }
 
 function createRoutine() {
+    showContainer("routine-container");
     setNumber = 0;
     document.getElementById("routineId").value = "";
     document.getElementById("newRoutineName").value = "";
     document.getElementById("numberOfRounds").value = "1";
     document.getElementById("sets").innerHTML = "";
-    document.getElementById("routine-container").style.display = "block";
-    document.getElementById("timer-container").style.display = "none";
-    document.getElementById("routines-container").style.display = "none";
+}
+
+function loadSelectedRoutine(routineNumber) {
+    routine = routines[routineNumber];
+    showContainer("timer-container", "flex");
+    document.getElementById("setName").textContent = routine.sets[0].setName;
+    document.getElementById("roundNumber").textContent = "1 / " + routine.rounds;
+    totalNumberOfRounds = routine.rounds;
+    intervalTimeDisplay.textContent = "00:00";
+    totalTimeDisplay.textContent = "00:00";
+    timer.style.backgroundImage = "";
+}
+
+function showSettings() {
+    showContainer("settings-container");
+}
+
+const containerIds = ["routine-container", "routines-container", "timer-container", "settings-container"];
+
+function showContainer(containerId, displayStyle = 'block') {
+    containerIds.forEach(id => {
+        const container = document.getElementById(id);
+        if (container) {
+            container.style.display = "none";
+        }
+    });
+
+    document.getElementById(containerId).style.display = displayStyle;
+
     menuToggle.checked = false;
 }
 
@@ -127,6 +149,8 @@ function incrementRound() {
         announce(finish);
         return;
     }
+
+    document.getElementById("roundNumber").textContent = currentRoundNumber + " / " + totalNumberOfRounds;
 
     currentSetNumber = 0;
 
@@ -230,7 +254,7 @@ function stopTimer() {
     clearTimeout(timerId);
 }
 
-let routines = [
+let defaultRoutines = [
     {
         "id": "cc315d92-3cd6-46e1-9862-15bc61df8cc0",
         "title": "Hypotrophy isometrics",
@@ -326,28 +350,17 @@ let routines = [
     }
 ];
 
+let routines = [];
+
 loadRoutines();
 
-function loadSelectedRoutine(routineNumber) {
-    routine = routines[routineNumber];
-    document.getElementById("routine-container").style.display = "none";
-    document.getElementById("routines-container").style.display = "none";
-    document.getElementById("timer-container").style.display = "flex";
-    menuToggle.checked = false;
-    document.getElementById("routineName").textContent = routine.title;
-    document.getElementById("setName").textContent = "";
-    totalNumberOfRounds = routine.rounds;
-    intervalTimeDisplay.textContent = "00:00";
-    totalTimeDisplay.textContent = "00:00";
-    timer.style.backgroundImage = "";
-}
-
 function loadRoutines() {
-
     const retrievedRoutines = localStorage.getItem('routines');
 
     if (retrievedRoutines) {
         routines = JSON.parse(retrievedRoutines);
+    } else {
+        routines = defaultRoutines;
     }
 
     let routinesContainer = document.getElementById("routines-container");
@@ -400,7 +413,7 @@ function editRoutine(routineNumber) {
     }
 }
 
-function addSet(setName = "", activeTime = 0, restTime = 0 ) {
+function addSet(setName = "", activeTime = 1, restTime = 0 ) {
     let currentSets = document.getElementById("sets");
 
     currentSets.insertAdjacentHTML('beforeend', `
@@ -471,4 +484,13 @@ function exportRoutines() {
     a.download = 'routines.json';
     a.click();
     URL.revokeObjectURL(url);
+}
+
+function clearLocalStorage() {
+
+    if (confirm("Are you sure you want to delete all your routines?")) {
+        localStorage.clear();
+
+        location.reload();
+    }
 }
