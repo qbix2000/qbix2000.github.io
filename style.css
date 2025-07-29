@@ -88,11 +88,12 @@ body {
     border: none;
     border-radius: 8px;
     padding: 12px 25px;
-    font-size: 1.1em;
+    font-size: 2em;
     cursor: pointer;
     margin: 10px 5px;
     transition: background-color 0.2s ease, transform 0.1s ease;
     box-shadow: 0 2px 5px var(--shadow-color);
+    font-weight: bold;
 }
 .button:hover {
     background-color: color-mix(in srgb, var(--primary-color) 85%, black); /* Slightly darker on hover */
@@ -255,4 +256,8 @@ body {
 .nav-link:hover {
     background-color: var(--primary-color);
     color: #ffffff;
-}  
+}
+
+h1 {
+    font-size: 3.0em;
+}
