@@ -7,6 +7,8 @@ let timer = document.getElementById("timer-container");
 let intervalTimeDisplay = document.getElementById("intervalTime");
 let totalTimeDisplay = document.getElementById("totalTime");
 
+const announcementTimes = [3000, 2000, 1000];
+
 const bodyStyles = getComputedStyle(document.body);
 const pageBackgroundColor = bodyStyles.getPropertyValue('--background-color');
 const activeColour = bodyStyles.getPropertyValue('--danger-color');
@@ -239,10 +241,21 @@ function runTimer() {
         return;
     }
 
+    announceTimeLeft();
+
     timePassed += timeIncrement;
     totalTime += timeIncrement;
 
     timerId = setTimeout(runTimer, timeIncrement);
+}
+
+function announceTimeLeft() {
+
+    let timeLeft = runTimeInMilliSeconds - timePassed;
+
+    if(announcementTimes.includes(timeLeft)) {
+        announce(timeLeft / 1000);
+    }
 }
 
 function toMinutesAndSeconds(milliSeconds) {
@@ -373,12 +386,12 @@ function loadRoutines() {
 
         routinesContainer.insertAdjacentHTML('beforeend', `
                     <div class="routines-table-row">
-                        <div class="routines-table-cell" onclick="editRoutine(${i});">✏</div>
+                        <div class="routines-table-cell" onclick="editRoutine(${i});"><h2>✏</h2></div>
                         <div class="routines-table-cell" onclick="loadSelectedRoutine(${i});">
-                            <h1>${routine.title}</h1>
+                            <h2>${routine.title}</h2>
                             <p>Total time: ${calculateRoutineLength(routine)}</p>
                         </div>
-                         <div class="routines-table-cell" onclick="deleteRoutine(${i});">🗑</div>
+                         <div class="routines-table-cell" onclick="deleteRoutine(${i});"><h2>🗑</h2></div>
                     </div>
                     `);
     }
