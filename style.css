@@ -157,10 +157,6 @@ body {
     .interval-name {
         font-size: 1.2em;
     }
-    .button {
-        /* width: calc(100% - 10px); /* Full width buttons on small screens */
-        margin: 5px 0;
-    }
     .timer-container {
         padding: 20px;
         margin: 10px;
@@ -260,4 +256,21 @@ body {
 
 h1 {
     font-size: 3.0em;
+}
+
+.routines-table {
+    display: table;
+}
+
+.routines-table-row {
+    display: table-row;
+}
+
+.routines-table-cell {
+    display: table-cell;
+    padding: 30px;
+    text-align: center;
+    align-items: center;
+    color: var(--text-color);
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
