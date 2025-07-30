@@ -7,6 +7,11 @@ let timer = document.getElementById("timer-container");
 let intervalTimeDisplay = document.getElementById("intervalTime");
 let totalTimeDisplay = document.getElementById("totalTime");
 
+const bodyStyles = getComputedStyle(document.body);
+const pageBackgroundColor = bodyStyles.getPropertyValue('--background-color');
+const activeColour = bodyStyles.getPropertyValue('--danger-color');
+const restColour = bodyStyles.getPropertyValue('--primary-color');
+
 let routine = {}
 
 let setNumber = 0;
@@ -181,11 +186,11 @@ function runIntervals() {
     runTimeInMilliSeconds = currentInterval.duration * 1000;
 
     if(currentInterval.type == "active") {
-        colour = "red";
+        colour = activeColour;
         announce(routine.sets[currentSetNumber].setName);
         document.getElementById("setName").textContent = routine.sets[currentSetNumber].setName;
     } else {
-        colour = "blue";
+        colour = restColour;
         announce(currentInterval.type);
     }
 
@@ -223,9 +228,6 @@ function announce(announcement) {
 
 function runTimer() {
     let percentage = (timePassed / runTimeInMilliSeconds) * 100;
-
-    const bodyStyles = getComputedStyle(document.body);
-    const pageBackgroundColor = bodyStyles.getPropertyValue('--background-color');
 
     timer.style.backgroundImage = "linear-gradient(to top, " + colour + " " + percentage + "%, " + pageBackgroundColor + " " + percentage + "%)";
     intervalTimeDisplay.textContent = toMinutesAndSeconds(timePassed);
@@ -370,13 +372,13 @@ function loadRoutines() {
         let routine = routines[i];
 
         routinesContainer.insertAdjacentHTML('beforeend', `
-                    <div style="display:flex; align-text:center; align-items:center;">
-                        <div class="nav-link" onclick="editRoutine(${i});">✏</div>
-                        <div class="nav-link" onclick="loadSelectedRoutine(${i});">
-                            <h2>${routine.title}</h2>
+                    <div class="routines-table-row">
+                        <div class="routines-table-cell" onclick="editRoutine(${i});">✏</div>
+                        <div class="routines-table-cell" onclick="loadSelectedRoutine(${i});">
+                            <h1>${routine.title}</h1>
                             <p>Total time: ${calculateRoutineLength(routine)}</p>
                         </div>
-                         <div class="nav-link" onclick="deleteRoutine(${i});">🗑</div>
+                         <div class="routines-table-cell" onclick="deleteRoutine(${i});">🗑</div>
                     </div>
                     `);
     }
