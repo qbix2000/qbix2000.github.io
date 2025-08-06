@@ -486,7 +486,12 @@ async function pickSingleFile() {
 
 function importRoutines() {
 
-    showContainer("import-container");
+    showContainer("import-container", "flex");
+}
+
+function inportRequested() {
+    let fileInput = document.getElementById("fileInput");
+    fileInput.click();
 }
 
 function processFile() {
