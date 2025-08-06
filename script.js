@@ -6,6 +6,7 @@ let timeIncrement = 10;
 let timer = document.getElementById("timer-container");
 let intervalTimeDisplay = document.getElementById("intervalTime");
 let totalTimeDisplay = document.getElementById("totalTime");
+let timerId;
 
 const announcementTimes = [3000, 2000, 1000];
 
@@ -97,7 +98,7 @@ function showSettings() {
     showContainer("settings-container");
 }
 
-const containerIds = ["routine-container", "routines-container", "timer-container", "settings-container"];
+const containerIds = ["routine-container", "routines-container", "timer-container", "settings-container", "import-container"];
 
 function showContainer(containerId, displayStyle = 'block') {
     containerIds.forEach(id => {
@@ -108,7 +109,7 @@ function showContainer(containerId, displayStyle = 'block') {
     });
 
     document.getElementById(containerId).style.display = displayStyle;
-
+    stopTimer();
     menuToggle.checked = false;
 }
 
@@ -141,6 +142,12 @@ function buildSets() {
 }
 
 function startTimer() {
+
+    if(timerId != null) {
+        runTimer();
+        return;
+    }
+
     currentRoundNumber = 0;
     currentSetNumber = 0;
     totalTime = 0;
@@ -337,7 +344,7 @@ let defaultRoutines = [
                   "type": "rest"}
              ]
             },
-            {"setName": "straddle jump",
+            {"setName": "Straddle jump",
              "intervals": [
                  {"duration": 40,
                   "type": "active"},
@@ -452,9 +459,15 @@ function addSet(setName = "", activeTime = 1, restTime = 0 ) {
 }
 
 function deleteRoutine(routineNumber) {
-    routines.splice(routineNumber, 1);
 
-    saveRoutines();
+    let routineToDelete = routines[routineNumber]
+
+    if (confirm(`Are you sure you want to delete ${routineToDelete.title}?`)) {
+    
+        routines.splice(routineNumber, 1);
+
+        saveRoutines();
+    }
 }
 
 async function pickSingleFile() {
@@ -470,22 +483,35 @@ async function pickSingleFile() {
     return await fileHandle.getFile();
 }
 
-async function importRoutines() {
-    try {
-        const file = await pickSingleFile();
-        let fileContent = await file.text();
 
+function importRoutines() {
+
+    showContainer("import-container");
+}
+
+function processFile() {
+
+    const fileInput = document.getElementById('fileInput');
+    const files = fileInput.files;
+    const file = fileInput.files[0];
+
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+        const fileContent = e.target.result;
         const parsedJsonObject = JSON.parse(fileContent);
 
         routines = routines.concat(parsedJsonObject);
 
         saveRoutines();
+    };
 
-    } catch (error) {
-        if(error.name != "AbortError") {
-            alert("unable to read file: " + error);
-        }
-    }
+    reader.onerror = function(e) {
+        console.error("Error reading file:", e.target.error);
+    };
+
+    reader.readAsText(file); 
+
 }
 
 function exportRoutines() {
