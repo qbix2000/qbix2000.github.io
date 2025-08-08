@@ -83,11 +83,11 @@ function createRoutine() {
     document.getElementById("sets").innerHTML = "";
 }
 
-function loadSelectedRoutine(routineNumber) {
+async function loadSelectedRoutine(routineNumber) {
     routine = routines[routineNumber];
     clearRoutineData();
     showContainer("timer-container", "flex");
-    startWakeLock();
+    await startWakeLock();
     document.getElementById("setName").textContent = routine.sets[0].setName;
     document.getElementById("roundNumber").textContent = "1 / " + routine.rounds;
     totalNumberOfRounds = routine.rounds;
@@ -98,26 +98,23 @@ function loadSelectedRoutine(routineNumber) {
 
 let wakeLock = null;
 
-function startWakeLock() {
+async function startWakeLock() {
 
     if ('wakeLock' in navigator == false) {
         alert("Your device may go to sleep during the running of your routine, please ensure that your device settings stop this from happening");
         return;
     }
 
-    const requestWakeLock = async () => {
-        try {
-            wakeLock = await navigator.wakeLock.request('screen');
+    try {
+        wakeLock = await navigator.wakeLock.request('screen');
 
-            wakeLock.onrelease = function(ev) {
-                console.log(ev);
-            }
-
-        } catch (err) {
-            alert(`Unable to stop your device from sleeping\n${err.name}\n${err.message}`);
+        wakeLock.onrelease = function(ev) {
+            console.log(ev);
         }
-    }
 
+    } catch (err) {
+        alert(`Unable to stop your device from sleeping\n${err.name}\n${err.message}`);
+    }
 }
 
 function endWakeLock() {
