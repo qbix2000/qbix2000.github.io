@@ -95,6 +95,11 @@ body {
     box-shadow: 0 2px 5px var(--shadow-color);
     font-weight: bold;
 }
+
+.button.small {
+    font-size: 1em;
+}
+
 .button:hover {
     background-color: color-mix(in srgb, var(--primary-color) 85%, black); /* Slightly darker on hover */
 }
@@ -109,11 +114,11 @@ body {
 .button.start:hover {
     background-color: color-mix(in srgb, var(--accent-color) 85%, black);
 }
-.button.pause {
+.button.stop {
     background-color: var(--warning-color);
     color: var(--text-color); /* Dark text for warning button */
 }
-.button.pause:hover {
+.button.stop:hover {
     background-color: color-mix(in srgb, var(--warning-color) 85%, black);
 }
 .button.reset {
@@ -255,7 +260,7 @@ body {
 }
 
 h1 {
-    font-size: 3.0em;
+    font-size: 2.5em;
 }
 
 .routines-table {
