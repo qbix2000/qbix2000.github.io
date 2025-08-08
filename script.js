@@ -85,7 +85,9 @@ function createRoutine() {
 
 function loadSelectedRoutine(routineNumber) {
     routine = routines[routineNumber];
+    clearRoutineData();
     showContainer("timer-container", "flex");
+    startWakeLock();
     document.getElementById("setName").textContent = routine.sets[0].setName;
     document.getElementById("roundNumber").textContent = "1 / " + routine.rounds;
     totalNumberOfRounds = routine.rounds;
@@ -93,6 +95,43 @@ function loadSelectedRoutine(routineNumber) {
     totalTimeDisplay.textContent = "00:00";
     timer.style.backgroundImage = "";
 }
+
+let wakeLock = null;
+
+function startWakeLock() {
+
+    if ('wakeLock' in navigator == false) {
+        alert("Your device may go to sleep during the running of your routine, please ensure that your device settings stop this from happening");
+        return;
+    }
+
+    const requestWakeLock = async () => {
+        try {
+            wakeLock = await navigator.wakeLock.request('screen');
+
+            wakeLock.onrelease = function(ev) {
+                console.log(ev);
+            }
+
+        } catch (err) {
+            alert(`Unable to stop your device from sleeping\n${err.name}\n${err.message}`);
+        }
+    }
+
+}
+
+function endWakeLock() {
+
+    if(wakeLock == null) {
+        return;
+    }
+    
+    wakeLock.release()
+        .then(() => {
+            wakeLock = null;
+        });
+}
+
 
 function showSettings() {
     showContainer("settings-container");
@@ -111,6 +150,7 @@ function showContainer(containerId, displayStyle = 'block') {
     document.getElementById(containerId).style.display = displayStyle;
     stopTimer();
     menuToggle.checked = false;
+    endWakeLock();
 }
 
 function buildSets() {
@@ -148,12 +188,17 @@ function startTimer() {
         return;
     }
 
+    clearRoutineData();
+
+    incrementRound();
+}
+
+function clearRoutineData() {
     currentRoundNumber = 0;
     currentSetNumber = 0;
     totalTime = 0;
     timePassed = 0;
-
-    incrementRound();
+    timerId = null;
 }
 
 function incrementRound() {
@@ -161,6 +206,8 @@ function incrementRound() {
 
     if(currentRoundNumber > totalNumberOfRounds) {
         announce(finish);
+        timerId = null;
+        endWakeLock();
         return;
     }
 
@@ -451,7 +498,7 @@ function addSet(setName = "", activeTime = 1, restTime = 0 ) {
                     <label for="restTime${setNumber}">Rest time: </label>
                     <input type="number" min="0" value="${restTime}" id="restTime${setNumber}" class="restTimeInput" required oninvalid="this.setCustomValidity('Please enter a valid rest time.')"
                        oninput="this.setCustomValidity('')"/><br/>
-                    <button class="button" onclick="deleteSet(${setNumber});">Delete</button>
+                    <button class="button small" onclick="deleteSet(${setNumber});">Delete</button>
                 </div>
             `);
 
@@ -469,20 +516,6 @@ function deleteRoutine(routineNumber) {
         saveRoutines();
     }
 }
-
-async function pickSingleFile() {
-    const [fileHandle] = await window.showOpenFilePicker({
-        types: [{
-            description: 'JSON Files',
-            accept: {
-                'application/json': ['.json'],
-            },
-        }],
-        multiple: false
-    });
-    return await fileHandle.getFile();
-}
-
 
 function importRoutines() {
 
