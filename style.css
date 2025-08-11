@@ -263,6 +263,23 @@ h1 {
     font-size: 2.5em;
 }
 
+.routine-name {
+    margin-block-end: 0.2em;
+}
+
+.smallText {
+    font-size: 1.5em;
+    margin-block-start: 0em;
+    margin-block-end: 0em;
+}
+
+hr {
+    height: 2px;
+    background-color: var(--primary-color);
+    width: 50%;
+    margin-block-start: 0px;
+}
+
 .routines-table {
     display: table;
 }
