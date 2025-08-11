@@ -88,7 +88,8 @@ async function loadSelectedRoutine(routineNumber) {
     clearRoutineData();
     showContainer("timer-container", "flex");
     await startWakeLock();
-    document.getElementById("setName").textContent = routine.sets[0].setName;
+    document.getElementById("setName").textContent = "Ready";
+    document.getElementById("nextSetName").textContent = routine.sets[0].setName;
     document.getElementById("roundNumber").textContent = "1 / " + routine.rounds;
     totalNumberOfRounds = routine.rounds;
     intervalTimeDisplay.textContent = "00:00";
@@ -204,7 +205,8 @@ function incrementRound() {
     if(currentRoundNumber > totalNumberOfRounds) {
         announce(finish);
         timerId = null;
-        endWakeLock();
+        document.getElementById("setName").textContent = finish;
+        document.getElementById("nextSetName").textContent = "";
         return;
     }
 
@@ -242,6 +244,7 @@ function runIntervals() {
         colour = activeColour;
         announce(routine.sets[currentSetNumber].setName);
         document.getElementById("setName").textContent = routine.sets[currentSetNumber].setName;
+        setNextSetName(routine, currentRoundNumber, currentSetNumber);
     } else {
         colour = restColour;
         announce(currentInterval.type);
@@ -249,6 +252,20 @@ function runIntervals() {
 
     timePassed = 0;
     runTimer();
+}
+
+function setNextSetName(routine, currentRoundNumber, currentSetNumber) {
+
+    let nextSetNumber = currentSetNumber + 1 >= routine.sets.length ? 0 : currentSetNumber + 1;
+
+    let nextSetName = routine.sets[nextSetNumber].setName;
+
+    if(currentRoundNumber - 1 == routine.rounds.length && currentSetNumber + 1 == routine.sets.length) {
+        nextSetName = finish;
+    }
+
+    document.getElementById("nextSetName").textContent = nextSetName;
+
 }
 
 function announce(announcement) {
