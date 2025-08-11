@@ -430,6 +430,83 @@ let defaultRoutines = [
              ]
             }
         ]
+    },
+    {
+        "id": "91edee8c-6f17-411c-8c43-40680556405f",
+        "title": "Intermediate skipping",
+        "rounds": 3,
+        "sets": [
+            {"setName": "High knees",
+             "intervals": [
+                 {"duration": 45,
+                  "type": "active"},
+                 {"duration": 15,
+                  "type": "rest"}
+             ]
+            },
+            {"setName": "Bell jumps",
+             "intervals": [
+                 {"duration": 45,
+                  "type": "active"},
+                 {"duration": 15,
+                  "type": "rest"}
+             ]
+            },
+            {"setName": "Half twisters",
+             "intervals": [
+                 {"duration": 45,
+                  "type": "active"},
+                 {"duration": 15,
+                  "type": "rest"}
+             ]
+            },
+            {"setName": "Straddle jump",
+             "intervals": [
+                 {"duration": 45,
+                  "type": "active"},
+                 {"duration": 15,
+                  "type": "rest"}
+             ]
+            },
+            {"setName": "Forward and back",
+             "intervals": [
+                 {"duration": 45,
+                  "type": "active"},
+                 {"duration": 15,
+                  "type": "rest"}
+             ]
+            }
+        ]
+    },
+    {
+        "id": "91edee8c-6f17-411c-8c43-40680556405g",
+        "title": "RKC minimum",
+        "rounds": 10,
+        "sets": [
+            {"setName": "Go",
+             "intervals": [
+                 {"duration": 60,
+                  "type": "active"},
+                 {"duration": 0,
+                  "type": "rest"}
+             ]
+            }
+        ]
+    },
+    {
+        "id": "91edee8c-6f17-411c-8c43-40680556405h",
+        "title": "30 seconds on 30 seconds off",
+        "rounds": 20,
+        "sets": [
+            {"setName": "Go",
+             "intervals": [
+                 {"duration": 30,
+                  "type": "active"},
+                 {"duration": 30,
+                  "type": "rest"}
+             ]
+            }
+        ]
     }
 ];
 
