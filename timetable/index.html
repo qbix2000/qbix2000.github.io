@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Timetable</title>
+    <!-- Use Tailwind CSS for modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Define the new color scheme with CSS variables */
+        :root {
+            --bg-color: #2b2d42;
+            --primary-bg: #3a3c50;
+            --secondary-bg: #4a4c64;
+            --text-color: #e0e0e0;
+            --accent-color: #f2b64b;
+            --border-color: #5d5f77;
+            --google-blue: #4285F4;
+        }
+
+        /* Apply the new color scheme to the entire body and override some Tailwind defaults */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .calendar-grid {
+            border: 1px solid var(--border-color);
+            background-color: var(--primary-bg);
+        }
+        .time-label {
+            color: var(--text-color);
+            border-bottom: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+        }
+        .calendar-cell {
+            border-bottom: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+        }
+        .calendar-cell:hover {
+            background-color: var(--secondary-bg);
+        }
+        .day-header, .day-header-placeholder {
+            color: var(--text-color);
+            background-color: var(--secondary-bg);
+            border-bottom: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+        }
+        .day-header-placeholder {
+            border-right: 1px solid var(--border-color);
+        }
+        .modal-content {
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+        }
+        .class-box {
+            background-color: #63b3ed; /* Use a default color that will be replaced */
+            color: white;
+        }
+        .text-gray-900 {
+            color: var(--text-color);
+        }
+        .text-gray-700 {
+            color: var(--text-color);
+        }
+        .text-gray-300 {
+            color: var(--border-color);
+        }
+        .border-gray-300 {
+            border-color: var(--border-color);
+        }
+        .bg-white {
+            background-color: var(--secondary-bg);
+        }
+        .cancel-btn {
+            color: var(--text-color);
+            border-color: var(--border-color);
+            background-color: transparent;
+        }
+        .cancel-btn:hover {
+            background-color: var(--secondary-bg);
+        }
+        .calendar-cell.occupied {
+            cursor: pointer; /* Change cursor to pointer for homework modal */
+            background-color: #2b2d42;
+        }
+        .class-form input, .class-form select, .homework-form input, .homework-form textarea {
+            background-color: var(--secondary-bg);
+            border-color: var(--border-color);
+            color: var(--text-color);
+        }
+        .save-btn {
+            background-color: var(--google-blue);
+            color: white;
+        }
+        .save-btn:hover {
+            background-color: #3c77e7;
+        }
+        .clear-btn {
+            background-color: var(--accent-color);
+            color: #2b2d42;
+        }
+        .clear-btn:hover {
+            background-color: #f2c77d;
+        }
+        .homework-list-item {
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+        }
+        .homework-list-item:last-child {
+            border-bottom: none;
+        }
+
+        /* New style for completed homework */
+        .homework-list-item.done h4, .homework-list-item.done p, .homework-list-item.done small {
+            text-decoration: line-through;
+            color: #888;
+        }
+        .homework-list-item .done-checkbox {
+            color: var(--google-blue);
+        }
+        #clear-completed-btn {
+            background-color: #ef4444; /* A red color */
+            color: white;
+        }
+        #clear-completed-btn:hover {
+            background-color: #dc2626;
+        }
+        /* --- Confirmation Modal specific button styles --- */
+        #confirm-clear-btn {
+            background-color: #e53e3e;
+        }
+        #confirm-clear-btn:hover {
+            background-color: #c53030;
+        }
+
+
+        /* Common Styles */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: 80px repeat(5, 1fr);
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+        .time-label {
+            height: 4rem;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .calendar-cell {
+            height: 4rem;
+            padding: 0.5rem;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .calendar-cell:nth-child(5n + 5) {
+            border-right: none;
+        }
+        .calendar-grid > div:last-child > .calendar-cell {
+            border-bottom: none;
+        }
+        .day-header {
+            height: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            border-right: 1px solid;
+        }
+        .day-header:last-child {
+            border-right: none;
+        }
+        .day-header-placeholder {
+            height: 3rem;
+            border-right: 1px solid;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            padding: 20px;
+            border-radius: 0.75rem;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .close-btn {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close-btn:hover, .close-btn:focus {
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .class-box {
+            position: absolute;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem;
+            border-radius: 0.25rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            left: 0;
+            right: 0;
+            margin: 0.25rem;
+            overflow: hidden;
+            z-index: 10;
+            color: white;
+            cursor: pointer;
+        }
+        .message-box {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 200;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            align-items: center;
+            space-x: 0.5rem;
+        }
+        #confirmation-message {
+            background-color: #48bb78;
+            color: white;
+        }
+
+        /* --- Color Swatch Specific Styles --- */
+        .color-swatch-container {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 0.5rem;
+        }
+        .color-swatch {
+            width: 100%;
+            padding-bottom: 100%; /* Creates a square aspect ratio */
+            border-radius: 0.375rem; /* rounded-md */
+            cursor: pointer;
+            position: relative;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
+            border: 2px solid transparent;
+        }
+        .color-swatch:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .color-swatch.selected {
+            border: 2px solid var(--google-blue);
+        }
+        .color-swatch.selected::after {
+            content: '✔';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--text-color);
+            font-size: 1rem;
+            font-weight: bold;
+        }
+        
+        .homework-list-item h4 {
+            margin-bottom: 0.25rem;
+        }
+        .homework-list-item p {
+            margin-top: 0;
+        }
+        .homework-list-item small {
+            color: var(--text-color);
+            font-size: 0.75rem;
+        }
+
+        /* --- Responsive Styles for Mobile --- */
+        @media (max-width: 768px) {
+            .calendar-header-nav {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 1rem;
+                background-color: inherit;
+            }
+            .calendar-grid {
+                grid-template-columns: 80px 1fr;
+            }
+            .day-header {
+                display: none;
+            }
+            .day-header-placeholder {
+                display: none;
+            }
+            .day-header-mobile {
+                display: flex;
+                flex-grow: 1;
+                justify-content: center;
+                font-weight: 700;
+                font-size: 1.25rem;
+                align-items: center;
+            }
+            .day-column {
+                display: none;
+            }
+            .day-column.active {
+                display: grid;
+                grid-template-rows: subgrid;
+                grid-row: span 12;
+            }
+            .time-label {
+                border-right: 1px solid var(--border-color);
+            }
+        }
+    </style>
+</head>
+<body class="p-8">
+    <div class="max-w-7xl mx-auto rounded-xl shadow-lg">
+        <header class="flex justify-between items-center p-6 border-b rounded-t-xl" style="border-bottom-color: var(--border-color);">
+            <!-- Hamburger menu button -->
+            <button id="settings-btn" class="text-gray-500 hover:text-gray-200 transition focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                </svg>
+            </button>
+            <h1 class="text-3xl font-bold">Weekly Timetable</h1>
+            <!-- Placeholder for alignment on desktop -->
+            <div class="w-8"></div>
+        </header>
+
+        <div class="calendar-header-nav md:hidden">
+            <button id="prev-day-btn" class="text-2xl p-2 rounded-full hover:bg-gray-700 transition">&lt;</button>
+            <div id="day-display" class="day-header-mobile">Monday</div>
+            <button id="next-day-btn" class="text-2xl p-2 rounded-full hover:bg-gray-700 transition">&gt;</button>
+        </div>
+
+        <div class="calendar-grid" id="calendar-grid">
+            <!-- Header Row (desktop only) -->
+            <div class="day-header-placeholder hidden md:block"></div>
+            <div class="day-header hidden md:flex" data-day="Monday">Monday</div>
+            <div class="day-header hidden md:flex" data-day="Tuesday">Tuesday</div>
+            <div class="day-header hidden md:flex" data-day="Wednesday">Wednesday</div>
+            <div class="day-header hidden md:flex" data-day="Thursday">Thursday</div>
+            <div class="day-header hidden md:flex" data-day="Friday">Friday</div>
+
+            <!-- Time Slots from 7:00 AM to 6:00 PM -->
+            <!-- 7:00 AM -->
+            <div class="time-label">7:00 AM</div>
+            <div class="calendar-cell" data-day="Monday" data-time="07:00"></div>
+            <div class="calendar-cell" data-day="Tuesday" data-time="07:00"></div>
+            <div class="calendar-cell" data-day="Wednesday" data-time="07:00"></div>
+            <div class="calendar-cell" data-day="Thursday" data-time="07:00"></div>
+            <div class="calendar-cell" data-day="Friday" data-time="07:00"></div>
+
+            <!-- 8:00 AM -->
+            <div class="time-label">8:00 AM</div>
+            <div class="calendar-cell" data-day="Monday" data-time="08:00"></div>
+            <div class="calendar-cell" data-day="Tuesday" data-time="08:00"></div>
+            <div class="calendar-cell" data-day="Wednesday" data-time="08:00"></div>
+            <div class="calendar-cell" data-day="Thursday" data-time="08:00"></div>
+            <div class="calendar-cell" data-day="Friday" data-time="08:00"></div>
+
+            <!-- 9:00 AM -->
+            <div class="time-label">9:00 AM</div>
+            <div class="calendar-cell" data-day="Monday" data-time="09:00"></div>
+            <div class="calendar-cell" data-day="Tuesday" data-time="09:00"></div>
+            <div class="calendar-cell" data-day="Wednesday" data-time="09:00"></div>
+            <div class="calendar-cell" data-day="Thursday" data-time="09:00"></div>
+            <div class="calendar-cell" data-day="Friday" data-time="09:00"></div>
+
+            <!-- 10:00 AM -->
+            <div class="time-label">10:00 AM</div>
+            <div class="calendar-cell" data-day="Monday" data-time="10:00"></div>
+            <div class="calendar-cell" data-day="Tuesday" data-time="10:00"></div>
+            <div class="calendar-cell" data-day="Wednesday" data-time="10:00"></div>
+            <div class="calendar-cell" data-day="Thursday" data-time="10:00"></div>
+            <div class="calendar-cell" data-day="Friday" data-time="10:00"></div>
+            
+            <!-- 11:00 AM -->
+            <div class="time-label">11:00 AM</div>
+            <div class="calendar-cell" data-day="Monday" data-time="11:00"></div>
+            <div class="calendar-cell" data-day="Tuesday" data-time="11:00"></div>
+            <div class="calendar-cell" data-day="Wednesday" data-time="11:00"></div>
+            <div class="calendar-cell" data-day="Thursday" data-time="11:00"></div>
+            <div class="calendar-cell" data-day="Friday" data-time="11:00"></div>
+
+            <!-- 12:00 PM -->
+            <div class="time-label">12:00 PM</div>
+            <div class="calendar-cell" data-day="Monday" data-time="12:00"></div>
+            <div class="calendar-cell" data-day="Tuesday" data-time="12:00"></div>
+            <div class="calendar-cell" data-day="Wednesday" data-time="12:00"></div>
+            <div class="calendar-cell" data-day="Thursday" data-time="12:00"></div>
+            <div class="calendar-cell" data-day="Friday" data-time="12:00"></div>
+            
+            <!-- 1:00 PM -->
+            <div class="time-label">1:00 PM</div>
+            <div class="calendar-cell" data-day="Monday" data-time="13:00"></div>
+            <div class="calendar-cell" data-day="Tuesday" data-time="13:00"></div>
+            <div class="calendar-cell" data-day="Wednesday" data-time="13:00"></div>
+            <div class="calendar-cell" data-day="Thursday" data-time="13:00"></div>
+            <div class="calendar-cell" data-day="Friday" data-time="13:00"></div>
+
+            <!-- 2:00 PM -->
+            <div class="time-label">2:00 PM</div>
+            <div class="calendar-cell" data-day="Monday" data-time="14:00"></div>
+            <div class="calendar-cell" data-day="Tuesday" data-time="14:00"></div>
+            <div class="calendar-cell" data-day="Wednesday" data-time="14:00"></div>
+            <div class="calendar-cell" data-day="Thursday" data-time="14:00"></div>
+            <div class="calendar-cell" data-day="Friday" data-time="14:00"></div>
+            
+            <!-- 3:00 PM -->
+            <div class="time-label">3:00 PM</div>
+            <div class="calendar-cell" data-day="Monday" data-time="15:00"></div>
+            <div class="calendar-cell" data-day="Tuesday" data-time="15:00"></div>
+            <div class="calendar-cell" data-day="Wednesday" data-time="15:00"></div>
+            <div class="calendar-cell" data-day="Thursday" data-time="15:00"></div>
+            <div class="calendar-cell" data-day="Friday" data-time="15:00"></div>
+
+            <!-- 4:00 PM -->
+            <div class="time-label">4:00 PM</div>
+            <div class="calendar-cell" data-day="Monday" data-time="16:00"></div>
+            <div class="calendar-cell" data-day="Tuesday" data-time="16:00"></div>
+            <div class="calendar-cell" data-day="Wednesday" data-time="16:00"></div>
+            <div class="calendar-cell" data-day="Thursday" data-time="16:00"></div>
+            <div class="calendar-cell" data-day="Friday" data-time="16:00"></div>
+            
+            <!-- 5:00 PM -->
+            <div class="time-label">5:00 PM</div>
+            <div class="calendar-cell" data-day="Monday" data-time="17:00"></div>
+            <div class="calendar-cell" data-day="Tuesday" data-time="17:00"></div>
+            <div class="calendar-cell" data-day="Wednesday" data-time="17:00"></div>
+            <div class="calendar-cell" data-day="Thursday" data-time="17:00"></div>
+            <div class="calendar-cell" data-day="Friday" data-time="17:00"></div>
+
+            <!-- 6:00 PM -->
+            <div class="time-label">6:00 PM</div>
+            <div class="calendar-cell" data-day="Monday" data-time="18:00"></div>
+            <div class="calendar-cell" data-day="Tuesday" data-time="18:00"></div>
+            <div class="calendar-cell" data-day="Wednesday" data-time="18:00"></div>
+            <div class="calendar-cell" data-day="Thursday" data-time="18:00"></div>
+            <div class="calendar-cell" data-day="Friday" data-time="18:00"></div>
+        </div>
+    </div>
+
+    <!-- Modal for adding a new class -->
+    <div id="class-modal" class="modal">
+        <div class="modal-content rounded-xl p-6">
+            <span class="close-btn">&times;</span>
+            <h2 class="text-2xl font-bold mb-4">Add Class</h2>
+            <form id="class-form" class="space-y-4">
+                <div>
+                    <label for="class-subject" class="block font-medium">Subject</label>
+                    <input type="text" id="class-subject" name="subject" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-gray-900" style="background-color: var(--secondary-bg); border-color: var(--border-color); color: var(--text-color);">
+                </div>
+                <div>
+                    <label for="class-teacher" class="block font-medium">Teacher</label>
+                    <input type="text" id="class-teacher" name="teacher" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-gray-900" style="background-color: var(--secondary-bg); border-color: var(--border-color); color: var(--text-color);">
+                </div>
+                <div>
+                    <label for="class-room" class="block font-medium">Room</label>
+                    <input type="text" id="class-room" name="room" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-gray-900" style="background-color: var(--secondary-bg); border-color: var(--border-color); color: var(--text-color);">
+                </div>
+                <div>
+                    <label for="start-time" class="block font-medium">Start Time</label>
+                    <input type="time" id="start-time" name="startTime" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-gray-900" style="background-color: var(--secondary-bg); border-color: var(--border-color); color: var(--text-color);">
+                </div>
+                <div>
+                    <label for="end-time" class="block font-medium">End Time</label>
+                    <input type="time" id="end-time" name="endTime" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-gray-900" style="background-color: var(--secondary-bg); border-color: var(--border-color); color: var(--text-color);">
+                </div>
+                <div>
+                    <label class="block font-medium">Color</label>
+                    <div class="color-swatch-container mt-1" id="color-swatch-container">
+                        <!-- Color swatches will be populated here by JavaScript -->
+                    </div>
+                    <input type="hidden" id="class-color" name="color" value="#f2b64b"> <!-- Hidden input to store the selected color -->
+                </div>
+                <div class="flex justify-end">
+                    <button type="button" id="cancel-class-btn" class="cancel-btn mr-2 px-4 py-2 rounded-md border text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Cancel
+                    </button>
+                    <button type="submit" class="save-btn px-4 py-2 rounded-md border border-transparent text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-google-blue">
+                        Save Class
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for adding homework -->
+    <div id="homework-modal" class="modal">
+        <div class="modal-content rounded-xl p-6">
+            <span class="close-btn" id="close-homework-btn">&times;</span>
+            <h2 class="text-2xl font-bold mb-4">Add Homework</h2>
+            <form id="homework-form" class="space-y-4">
+                <div>
+                    <label for="homework-subject" class="block font-medium">Subject</label>
+                    <input type="text" id="homework-subject" name="subject" readonly class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-gray-900" style="background-color: var(--secondary-bg); border-color: var(--border-color); color: var(--text-color);">
+                </div>
+                <div>
+                    <label for="homework-due-date" class="block font-medium">Due Date</label>
+                    <input type="date" id="homework-due-date" name="dueDate" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-gray-900" style="background-color: var(--secondary-bg); border-color: var(--border-color); color: var(--text-color);">
+                </div>
+                <div>
+                    <label for="homework-description" class="block font-medium">Homework</label>
+                    <textarea id="homework-description" name="homework" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-gray-900" rows="4" style="background-color: var(--secondary-bg); border-color: var(--border-color); color: var(--text-color);"></textarea>
+                </div>
+                <div class="flex justify-end">
+                    <button type="button" id="cancel-homework-btn" class="cancel-btn mr-2 px-4 py-2 rounded-md border text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Cancel
+                    </button>
+                    <button type="submit" class="save-btn px-4 py-2 rounded-md border border-transparent text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-google-blue">
+                        Save Homework
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal">
+        <div class="modal-content rounded-xl p-6">
+            <span class="close-btn" id="close-settings-btn">&times;</span>
+            <h2 class="text-2xl font-bold mb-4">Settings</h2>
+            <div class="space-y-4">
+                <button id="view-homework-btn" class="w-full text-left px-4 py-3 rounded-md border border-gray-300 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" style="background-color: var(--secondary-bg); border-color: var(--border-color);">
+                    View Homework
+                </button>
+                <button id="clear-timetable-btn" class="clear-btn w-full text-left px-4 py-3 rounded-md border border-transparent text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                    Clear Timetable
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Homework List Modal -->
+    <div id="homework-list-modal" class="modal">
+        <div class="modal-content rounded-xl p-6">
+            <span class="close-btn" id="close-homework-list-btn">&times;</span>
+            <h2 class="text-2xl font-bold mb-4">Upcoming Homework</h2>
+            <div id="homework-list-container" class="space-y-4 max-h-96 overflow-y-auto">
+                <!-- Homework items will be dynamically inserted here -->
+            </div>
+            <div class="mt-4 flex flex-col items-center justify-center space-y-2">
+                <button id="clear-completed-btn" class="px-4 py-2 rounded-md border border-transparent text-sm font-medium shadow-sm">
+                    Clear Completed <span id="completed-count" class="ml-2 font-bold">(0)</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmation-modal" class="modal">
+        <div class="modal-content rounded-xl p-6 text-center">
+            <h3 class="text-xl font-bold mb-4">Are you sure?</h3>
+            <p class="mb-6">This will permanently delete all classes from your timetable.</p>
+            <div class="flex justify-center space-x-4">
+                <button id="confirm-clear-btn" class="px-4 py-2 rounded-md border border-transparent text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                    Yes, clear it
+                </button>
+                <button id="cancel-clear-btn" class="cancel-btn px-4 py-2 rounded-md border text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    No, cancel
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="confirmation-message" class="message-box flex items-center space-x-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+        <span>Class saved!</span>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const calendarGrid = document.getElementById('calendar-grid');
+            const classModal = document.getElementById('class-modal');
+            const classForm = document.getElementById('class-form');
+            const classCloseBtn = document.querySelector('#class-modal .close-btn');
+            const cancelClassBtn = document.getElementById('cancel-class-btn');
+            const confirmationMessage = document.getElementById('confirmation-message');
+
+            const homeworkModal = document.getElementById('homework-modal');
+            const homeworkForm = document.getElementById('homework-form');
+            const homeworkCloseBtn = document.getElementById('close-homework-btn');
+            const cancelHomeworkBtn = document.getElementById('cancel-homework-btn');
+            
+            const homeworkListModal = document.getElementById('homework-list-modal');
+            const homeworkListContainer = document.getElementById('homework-list-container');
+            const homeworkListCloseBtn = document.getElementById('close-homework-list-btn');
+            const clearCompletedBtn = document.getElementById('clear-completed-btn');
+            const completedCountSpan = document.getElementById('completed-count');
+
+
+            const settingsBtn = document.getElementById('settings-btn');
+            const settingsModal = document.getElementById('settings-modal');
+            const settingsCloseBtn = document.getElementById('close-settings-btn');
+            const clearTimetableBtn = document.getElementById('clear-timetable-btn');
+            const viewHomeworkBtn = document.getElementById('view-homework-btn');
+
+            const confirmationModal = document.getElementById('confirmation-modal');
+            const confirmClearBtn = document.getElementById('confirm-clear-btn');
+            const cancelClearBtn = document.getElementById('cancel-clear-btn');
+
+            const colorSwatchContainer = document.getElementById('color-swatch-container');
+            const classColorInput = document.getElementById('class-color');
+            const predefinedColors = [
+                '#f2b64b', '#4fd1c5', '#9f7aea', '#ed64a6',
+                '#f6e05e', '#63b3ed', '#e53e3e', '#718096',
+                '#38a169', '#d69e2e', '#c53030', '#a0aec0'
+            ];
+
+            let selectedDay = '';
+            let selectedTime = '';
+            const cellHeight = 64;
+
+            const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+            let currentDayIndex = 0;
+            const dayDisplay = document.getElementById('day-display');
+            const prevDayBtn = document.getElementById('prev-day-btn');
+            const nextDayBtn = document.getElementById('next-day-btn');
+            const timeLabels = document.querySelectorAll('.time-label');
+
+            let classes = {};
+            let homeworks = [];
+
+            /**
+             * Generates a unique ID for homework items.
+             * @returns {string} A unique identifier.
+             */
+            function generateUniqueId() {
+                return 'id-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+            }
+
+            /**
+             * Populates the color swatch container with predefined colors.
+             */
+            function populateColorSwatches() {
+                predefinedColors.forEach(color => {
+                    const swatch = document.createElement('div');
+                    swatch.className = 'color-swatch';
+                    swatch.style.backgroundColor = color;
+                    swatch.dataset.color = color;
+                    colorSwatchContainer.appendChild(swatch);
+                });
+
+                // Set initial selection
+                const defaultSwatch = colorSwatchContainer.querySelector(`[data-color="${classColorInput.value}"]`);
+                if (defaultSwatch) {
+                    defaultSwatch.classList.add('selected');
+                }
+            }
+
+            /**
+             * Handles the click event on a color swatch, updating the selected color.
+             * @param {Event} e The click event object.
+             */
+            function handleColorSelection(e) {
+                const selectedSwatch = e.target.closest('.color-swatch');
+                if (selectedSwatch) {
+                    // Remove 'selected' class from all swatches
+                    document.querySelectorAll('.color-swatch').forEach(swatch => {
+                        swatch.classList.remove('selected');
+                    });
+                    // Add 'selected' class to the clicked swatch
+                    selectedSwatch.classList.add('selected');
+                    // Update the hidden input value
+                    classColorInput.value = selectedSwatch.dataset.color;
+                }
+            }
+
+            /**
+             * Shows a message box for a brief period.
+             * @param {HTMLElement} messageElement The message element to display.
+             * @param {string} text The text to display in the message box.
+             */
+            function showMessage(messageElement, text) {
+                messageElement.querySelector('span').textContent = text;
+                messageElement.style.display = 'flex';
+                messageElement.offsetHeight; // Trigger reflow
+                messageElement.style.opacity = '1';
+                setTimeout(() => {
+                    messageElement.style.opacity = '0';
+                    setTimeout(() => {
+                        messageElement.style.display = 'none';
+                    }, 500);
+                }, 2000);
+            }
+
+            /**
+             * Opens the class modal and pre-populates the start and end times.
+             * @param {string} day The selected day.
+             * @param {string} time The selected time.
+             */
+            function openClassModal(day, time) {
+                selectedDay = day;
+                selectedTime = time;
+                classModal.style.display = 'flex';
+                const startTimeInput = document.getElementById('start-time');
+                const endTimeInput = document.getElementById('end-time');
+                
+                // Set start time
+                startTimeInput.value = time;
+
+                // Calculate and set end time to the next hour
+                const startHour = parseInt(time.split(':')[0], 10);
+                const endHour = (startHour + 1) % 24; // Simple increment, wraps at 24.
+                const endHourString = endHour.toString().padStart(2, '0');
+                endTimeInput.value = `${endHourString}:00`;
+            }
+
+            /**
+             * Closes the class modal and resets the form.
+             */
+            function closeClassModal() {
+                classModal.style.display = 'none';
+                classForm.reset();
+            }
+
+            /**
+             * Opens the homework modal.
+             * @param {string} subject The subject of the class.
+             */
+            function openHomeworkModal(subject) {
+                document.getElementById('homework-subject').value = subject;
+                homeworkModal.style.display = 'flex';
+            }
+
+            /**
+             * Closes the homework modal and resets the form.
+             */
+            function closeHomeworkModal() {
+                homeworkModal.style.display = 'none';
+                homeworkForm.reset();
+            }
+
+            /**
+             * Opens the homework list modal and populates it.
+             */
+            function openHomeworkListModal() {
+                renderHomeworkList();
+                homeworkListModal.style.display = 'flex';
+            }
+
+            /**
+             * Closes the homework list modal.
+             */
+            function closeHomeworkListModal() {
+                homeworkListModal.style.display = 'none';
+            }
+
+            /**
+             * Opens the settings modal.
+             */
+            function openSettingsModal() {
+                settingsModal.style.display = 'flex';
+            }
+
+            /**
+             * Closes the settings modal.
+             */
+            function closeSettingsModal() {
+                settingsModal.style.display = 'none';
+            }
+            
+            /**
+             * Opens the confirmation modal.
+             */
+            function openConfirmationModal() {
+                confirmationModal.style.display = 'flex';
+            }
+
+            /**
+             * Closes the confirmation modal.
+             */
+            function closeConfirmationModal() {
+                confirmationModal.style.display = 'none';
+            }
+
+            /**
+             * Loads data from local storage.
+             * This function now checks for and assigns IDs to old homework items.
+             */
+            function loadData() {
+                const storedClasses = localStorage.getItem('classTimetable');
+                if (storedClasses) {
+                    classes = JSON.parse(storedClasses);
+                } else {
+                    daysOfWeek.forEach(day => classes[day] = []);
+                }
+                
+                const storedHomeworks = localStorage.getItem('homeworks');
+                if (storedHomeworks) {
+                    homeworks = JSON.parse(storedHomeworks);
+                    // This new logic ensures every homework item has an ID.
+                    homeworks = homeworks.map(hw => {
+                        if (!hw.id) {
+                            return { ...hw, id: generateUniqueId() };
+                        }
+                        return hw;
+                    });
+                } else {
+                    homeworks = [];
+                }
+            }
+
+            /**
+             * Saves data to local storage.
+             */
+            function saveData() {
+                localStorage.setItem('classTimetable', JSON.stringify(classes));
+                localStorage.setItem('homeworks', JSON.stringify(homeworks));
+            }
+
+            /**
+             * Renders all classes on the calendar grid.
+             */
+            function renderAllClasses() {
+                document.querySelectorAll('.class-box').forEach(el => el.remove());
+
+                // Remove the 'occupied' class from all cells first
+                document.querySelectorAll('.calendar-cell').forEach(cell => {
+                    cell.classList.remove('occupied');
+                    cell.style.cursor = 'pointer';
+                });
+                
+                daysOfWeek.forEach(day => {
+                    if (classes[day]) {
+                        classes[day].forEach(classData => {
+                            const classBox = document.createElement('div');
+                            classBox.className = 'class-box';
+                            classBox.innerHTML = `
+                                <strong>${classData.subject}</strong>
+                                <div class="text-xs">${classData.teacher ? classData.teacher : ''}</div>
+                                <div class="text-xs">${classData.room ? classData.room : ''}</div>
+                            `;
+
+                            // Set the background color based on the saved color
+                            classBox.style.backgroundColor = classData.color;
+                            classBox.dataset.subject = classData.subject;
+
+                            const startHours = parseInt(classData.startTime.split(':')[0]);
+                            const startMinutes = parseInt(classData.startTime.split(':')[1]);
+                            const endHours = parseInt(classData.endTime.split(':')[0]);
+                            const endMinutes = parseInt(classData.endTime.split(':')[1]);
+
+                            const totalStartMinutes = (startHours * 60) + startMinutes;
+                            const totalEndMinutes = (endHours * 60) + endMinutes;
+                            const durationMinutes = totalEndMinutes - totalStartMinutes;
+
+                            const startHourFormatted = startHours < 10 ? `0${startHours}:00` : `${startHours}:00`;
+                            const targetCell = document.querySelector(`.calendar-cell[data-day="${day}"][data-time="${startHourFormatted}"]`);
+
+                            if (targetCell) {
+                                const topPositionMinutesInHour = startMinutes;
+                                const topPositionPixels = (topPositionMinutesInHour / 60) * cellHeight;
+                                const heightPixels = (durationMinutes / 60) * cellHeight;
+
+                                classBox.style.top = `${topPositionPixels}px`;
+                                classBox.style.height = `${heightPixels}px`;
+                                targetCell.appendChild(classBox);
+                                
+                                // Add a class to the cell to indicate it has a class
+                                targetCell.classList.add('occupied');
+                            }
+                        });
+                    }
+                });
+            }
+
+            /**
+             * Renders the list of homework assignments, sorted by due date.
+             */
+            function renderHomeworkList() {
+                homeworkListContainer.innerHTML = '';
+                
+                // Separate completed and pending homeworks
+                const pendingHomeworks = homeworks.filter(hw => !hw.isDone).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+                const completedHomeworks = homeworks.filter(hw => hw.isDone);
+
+                const displayList = [...pendingHomeworks, ...completedHomeworks];
+                
+                // Update the completed count
+                completedCountSpan.textContent = `(${completedHomeworks.length})`;
+
+                if (displayList.length === 0) {
+                    homeworkListContainer.innerHTML = `<p class="text-center text-gray-500">No homework to display.</p>`;
+                    return;
+                }
+
+                displayList.forEach((hw, index) => {
+                    const homeworkItem = document.createElement('label');
+                    homeworkItem.className = `homework-list-item p-3 cursor-pointer transition ${hw.isDone ? 'done' : ''}`;
+                    // The data-id is now on the input, not the label, for more direct access
+                    // homeworkItem.dataset.id = hw.id;
+
+                    homeworkItem.innerHTML = `
+                        <input type="checkbox" ${hw.isDone ? 'checked' : ''} data-id="${hw.id}" class="mr-3 h-5 w-5 text-google-blue rounded focus:ring-google-blue">
+                        <div>
+                            <h4 class="font-bold">${hw.subject}</h4>
+                            <p class="text-sm my-1">${hw.homework}</p>
+                            <small>Due: ${new Date(hw.dueDate).toDateString()}</small>
+                        </div>
+                    `;
+                    homeworkListContainer.appendChild(homeworkItem);
+                });
+            }
+
+            /**
+             * Updates the calendar view based on screen size for mobile navigation.
+             */
+            function updateVisibility() {
+                const dayColumns = document.querySelectorAll('.calendar-cell');
+                const dayHeaders = document.querySelectorAll('.day-header');
+                const isMobile = window.innerWidth <= 768;
+
+                if (isMobile) {
+                    dayHeaders.forEach(header => header.style.display = 'none');
+                    dayColumns.forEach(cell => {
+                        if (cell.dataset.day === daysOfWeek[currentDayIndex]) {
+                            cell.style.display = 'block';
+                        } else {
+                            cell.style.display = 'none';
+                        }
+                    });
+                    timeLabels.forEach(label => label.style.display = 'flex');
+                    dayDisplay.textContent = daysOfWeek[currentDayIndex];
+                } else {
+                    dayHeaders.forEach(header => header.style.display = 'flex');
+                    dayColumns.forEach(cell => cell.style.display = 'block');
+                }
+                renderAllClasses();
+            }
+
+            /**
+             * Navigates to the next day in mobile view.
+             */
+            function nextDay() {
+                currentDayIndex = (currentDayIndex + 1) % daysOfWeek.length;
+                updateVisibility();
+            }
+
+            /**
+             * Navigates to the previous day in mobile view.
+             */
+            function prevDay() {
+                currentDayIndex = (currentDayIndex - 1 + daysOfWeek.length) % daysOfWeek.length;
+                updateVisibility();
+            }
+
+            // --- Event Listeners ---
+            prevDayBtn.addEventListener('click', prevDay);
+            nextDayBtn.addEventListener('click', nextDay);
+
+            calendarGrid.addEventListener('click', (e) => {
+                const cell = e.target.closest('.calendar-cell');
+                const classBox = e.target.closest('.class-box');
+
+                if (classBox) {
+                    // If a class box is clicked, open the homework modal
+                    const subject = classBox.dataset.subject;
+                    openHomeworkModal(subject);
+                } else if (cell && !cell.classList.contains('occupied')) {
+                    // If an empty cell is clicked, open the class modal
+                    const day = cell.dataset.day;
+                    const time = cell.dataset.time;
+                    openClassModal(day, time);
+                }
+            });
+
+            classCloseBtn.addEventListener('click', closeClassModal);
+            cancelClassBtn.addEventListener('click', closeClassModal);
+            homeworkCloseBtn.addEventListener('click', closeHomeworkModal);
+            cancelHomeworkBtn.addEventListener('click', closeHomeworkModal);
+            homeworkListCloseBtn.addEventListener('click', closeHomeworkListModal);
+            colorSwatchContainer.addEventListener('click', handleColorSelection);
+
+            classForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(classForm);
+                const classData = Object.fromEntries(formData.entries());
+
+                const startTime = classData.startTime;
+                const endTime = classData.endTime;
+
+                // Simple validation to ensure end time is after start time
+                if (endTime <= startTime) {
+                    showMessage(confirmationMessage, "End time must be after start time."); 
+                    return;
+                }
+
+                classes[selectedDay].push({
+                    subject: classData.subject,
+                    teacher: classData.teacher,
+                    room: classData.room,
+                    startTime: classData.startTime,
+                    endTime: classData.endTime,
+                    color: classData.color
+                });
+
+                saveData(); // Save the updated data to local storage
+                closeClassModal();
+                updateVisibility();
+                showMessage(confirmationMessage, "Class saved!");
+            });
+            
+            homeworkForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(homeworkForm);
+                const homeworkData = Object.fromEntries(formData.entries());
+                
+                // Add a unique ID and a 'done' status to the new homework item
+                homeworks.push({
+                    id: generateUniqueId(),
+                    subject: homeworkData.subject,
+                    dueDate: homeworkData.dueDate,
+                    homework: homeworkData.homework,
+                    isDone: false
+                });
+                
+                saveData(); // Save the updated data to local storage
+                closeHomeworkModal();
+                showMessage(confirmationMessage, "Homework saved!");
+            });
+
+
+            window.addEventListener('click', (e) => {
+                if (e.target === classModal) {
+                    closeClassModal();
+                }
+                if (e.target === settingsModal) {
+                    closeSettingsModal();
+                }
+                if (e.target === confirmationModal) {
+                    closeConfirmationModal();
+                }
+                if (e.target === homeworkModal) {
+                    closeHomeworkModal();
+                }
+                if (e.target === homeworkListModal) {
+                    closeHomeworkListModal();
+                }
+            });
+
+            window.addEventListener('resize', updateVisibility);
+
+            // Settings Modal Event Listeners
+            settingsBtn.addEventListener('click', openSettingsModal);
+            settingsCloseBtn.addEventListener('click', closeSettingsModal);
+            viewHomeworkBtn.addEventListener('click', openHomeworkListModal);
+
+            clearTimetableBtn.addEventListener('click', openConfirmationModal);
+
+            confirmClearBtn.addEventListener('click', () => {
+                localStorage.removeItem('classTimetable');
+                localStorage.removeItem('homeworks');
+                daysOfWeek.forEach(day => classes[day] = []);
+                homeworks = [];
+                closeConfirmationModal();
+                closeSettingsModal();
+                updateVisibility();
+                showMessage(confirmationMessage, "Timetable cleared!");
+            });
+
+            cancelClearBtn.addEventListener('click', closeConfirmationModal);
+            
+            // Listen for changes in the homework list checkboxes
+            homeworkListContainer.addEventListener('change', (e) => {
+                // Check if the event target is a checkbox
+                if (e.target.type === 'checkbox') {
+                    // Get the homework ID directly from the checkbox's data attribute
+                    const homeworkId = e.target.dataset.id;
+                    const homeworkIndex = homeworks.findIndex(hw => hw.id === homeworkId);
+
+                    if (homeworkIndex > -1) {
+                        // Update the 'isDone' status
+                        homeworks[homeworkIndex].isDone = e.target.checked;
+                        
+                        // Save the updated data
+                        saveData();
+
+                        // Re-render the list to apply the visual change and reorder the list
+                        renderHomeworkList();
+                    }
+                }
+            });
+            
+            // New event listener for the "Clear Completed" button
+            clearCompletedBtn.addEventListener('click', () => {
+                // Filter out all homeworks that are marked as done
+                homeworks = homeworks.filter(hw => !hw.isDone);
+                
+                // Save the updated array to local storage
+                saveData();
+                
+                // Re-render the homework list to reflect the changes
+                renderHomeworkList();
+
+                // Show a confirmation message to the user
+                showMessage(confirmationMessage, "Completed homework cleared!");
+            });
+
+            // Initial setup
+            loadData(); // Load classes and homeworks from local storage on page load
+            updateVisibility();
+            populateColorSwatches();
+        });
+    </script>
+</body>
+</html>
