@@ -631,7 +631,9 @@
             let selectedTime = '';
             const cellHeight = 64;
 
-            const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+            // Use a full week array to map the Date().getDay() method, then filter for the timetable days.
+            const fullDaysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const timetableDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
             let currentDayIndex = 0;
             const dayDisplay = document.getElementById('day-display');
             const prevDayBtn = document.getElementById('prev-day-btn');
@@ -803,7 +805,7 @@
                 if (storedClasses) {
                     classes = JSON.parse(storedClasses);
                 } else {
-                    daysOfWeek.forEach(day => classes[day] = []);
+                    timetableDays.forEach(day => classes[day] = []);
                 }
                 
                 const storedHomeworks = localStorage.getItem('homeworks');
@@ -841,7 +843,7 @@
                     cell.style.cursor = 'pointer';
                 });
                 
-                daysOfWeek.forEach(day => {
+                timetableDays.forEach(day => {
                     if (classes[day]) {
                         classes[day].forEach(classData => {
                             const classBox = document.createElement('div');
@@ -934,14 +936,14 @@
                 if (isMobile) {
                     dayHeaders.forEach(header => header.style.display = 'none');
                     dayColumns.forEach(cell => {
-                        if (cell.dataset.day === daysOfWeek[currentDayIndex]) {
+                        if (cell.dataset.day === timetableDays[currentDayIndex]) {
                             cell.style.display = 'block';
                         } else {
                             cell.style.display = 'none';
                         }
                     });
                     timeLabels.forEach(label => label.style.display = 'flex');
-                    dayDisplay.textContent = daysOfWeek[currentDayIndex];
+                    dayDisplay.textContent = timetableDays[currentDayIndex];
                 } else {
                     dayHeaders.forEach(header => header.style.display = 'flex');
                     dayColumns.forEach(cell => cell.style.display = 'block');
@@ -953,7 +955,7 @@
              * Navigates to the next day in mobile view.
              */
             function nextDay() {
-                currentDayIndex = (currentDayIndex + 1) % daysOfWeek.length;
+                currentDayIndex = (currentDayIndex + 1) % timetableDays.length;
                 updateVisibility();
             }
 
@@ -961,8 +963,23 @@
              * Navigates to the previous day in mobile view.
              */
             function prevDay() {
-                currentDayIndex = (currentDayIndex - 1 + daysOfWeek.length) % daysOfWeek.length;
+                currentDayIndex = (currentDayIndex - 1 + timetableDays.length) % timetableDays.length;
                 updateVisibility();
+            }
+
+            /**
+             * Sets the initial day on page load, defaulting to the current day or Monday if it's a weekend.
+             */
+            function setInitialDay() {
+                const today = new Date().getDay(); // 0 is Sunday, 1 is Monday, ..., 6 is Saturday
+                const todayName = fullDaysOfWeek[today];
+                
+                let dayIndex = timetableDays.indexOf(todayName);
+                if (dayIndex === -1) {
+                    // If today is a weekend, default to Monday (index 0)
+                    dayIndex = 0;
+                }
+                currentDayIndex = dayIndex;
             }
 
             // --- Event Listeners ---
@@ -1071,7 +1088,7 @@
             confirmClearBtn.addEventListener('click', () => {
                 localStorage.removeItem('classTimetable');
                 localStorage.removeItem('homeworks');
-                daysOfWeek.forEach(day => classes[day] = []);
+                timetableDays.forEach(day => classes[day] = []);
                 homeworks = [];
                 closeConfirmationModal();
                 closeSettingsModal();
@@ -1119,6 +1136,7 @@
 
             // Initial setup
             loadData(); // Load classes and homeworks from local storage on page load
+            setInitialDay(); // Set the calendar to the current day on load
             updateVisibility();
             populateColorSwatches();
         });
