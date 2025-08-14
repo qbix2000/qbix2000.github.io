@@ -16,6 +16,7 @@
             --accent-color: #f2b64b;
             --border-color: #5d5f77;
             --google-blue: #4285F4;
+            --cell-height: 10rem;
         }
 
         /* Apply the new color scheme to the entire body and override some Tailwind defaults */
@@ -28,6 +29,7 @@
         .calendar-grid {
             border: 1px solid var(--border-color);
             background-color: var(--primary-bg);
+            position: relative; /* Essential for positioning the time tracker line */
         }
         .time-label {
             color: var(--text-color);
@@ -145,7 +147,7 @@
             overflow: hidden;
         }
         .time-label {
-            height: 4rem;
+            height: var(--cell-height); /* 60% taller */
             display: flex;
             align-items: center;
             justify-content: flex-end;
@@ -154,7 +156,7 @@
             font-weight: 500;
         }
         .calendar-cell {
-            height: 4rem;
+            height: var(--cell-height); /* 60% taller */
             padding: 0.5rem;
             position: relative;
             cursor: pointer;
@@ -167,7 +169,7 @@
             border-bottom: none;
         }
         .day-header {
-            height: 3rem;
+            height: 4.8rem; /* 60% taller */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -178,7 +180,7 @@
             border-right: none;
         }
         .day-header-placeholder {
-            height: 3rem;
+            height: 4.8rem; /* 60% taller */
             border-right: 1px solid;
         }
         .modal {
@@ -212,9 +214,9 @@
         }
         .class-box {
             position: absolute;
-            font-size: 0.75rem;
+            font-size: 1.3rem; /* 60% bigger */
             font-weight: 600;
-            padding: 0.25rem;
+            padding: 0.5rem;
             border-radius: 0.25rem;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             left: 0;
@@ -326,30 +328,60 @@
             .time-label {
                 border-right: 1px solid var(--border-color);
             }
+            .time-tracker-line {
+                width: calc(100% - 80px);
+            }
+        }
+
+        /* --- Time Tracker Line Styles --- */
+        #time-tracker-line {
+            position: absolute;
+            width: calc(100% - 80px); /* Span across the day columns */
+            left: 80px;
+            height: 2px;
+            background-color: var(--accent-color); /* A bright, visible color */
+            z-index: 50; /* Ensure the line is on top of other elements */
+            pointer-events: none; /* Make sure the line doesn't block clicks */
+            display: none; /* Hidden by default, shown for the current day */
+        }
+        
+        #time-tracker-line::before {
+            content: '';
+            position: absolute;
+            left: -8px; /* Position the dot slightly to the left of the line */
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            background-color: var(--accent-color);
+            border-radius: 50%;
         }
     </style>
 </head>
 <body class="p-8">
     <div class="max-w-7xl mx-auto rounded-xl shadow-lg">
-        <header class="flex justify-between items-center p-6 border-b rounded-t-xl" style="border-bottom-color: var(--border-color);">
+        <header id="header" class="flex justify-between items-center p-6 border-b rounded-t-xl" style="border-bottom-color: var(--border-color);">
             <!-- Hamburger menu button -->
             <button id="settings-btn" class="text-gray-500 hover:text-gray-200 transition focus:outline-none">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
                 </svg>
             </button>
-            <h1 class="text-3xl font-bold">Weekly Timetable</h1>
+            <h1 class="text-3xl font-bold">Timetable</h1>
             <!-- Placeholder for alignment on desktop -->
             <div class="w-8"></div>
         </header>
 
-        <div class="calendar-header-nav md:hidden">
+        <div id="calendar-header" class="calendar-header-nav md:hidden">
             <button id="prev-day-btn" class="text-2xl p-2 rounded-full hover:bg-gray-700 transition">&lt;</button>
             <div id="day-display" class="day-header-mobile">Monday</div>
             <button id="next-day-btn" class="text-2xl p-2 rounded-full hover:bg-gray-700 transition">&gt;</button>
         </div>
 
         <div class="calendar-grid" id="calendar-grid">
+            <!-- Time tracker line added here -->
+            <div id="time-tracker-line" style="display: none;"></div>
+
             <!-- Header Row (desktop only) -->
             <div class="day-header-placeholder hidden md:block"></div>
             <div class="day-header hidden md:flex" data-day="Monday">Monday</div>
@@ -460,7 +492,9 @@
     <!-- Modal for adding a new class -->
     <div id="class-modal" class="modal">
         <div class="modal-content rounded-xl p-6">
-            <span class="close-btn">&times;</span>
+            <div id="close-add-class-btn">
+                <span class="close-btn" >&times;</span>
+            </div>
             <h2 class="text-2xl font-bold mb-4">Add Class</h2>
             <form id="class-form" class="space-y-4">
                 <div>
@@ -542,6 +576,9 @@
                 <button id="view-homework-btn" class="w-full text-left px-4 py-3 rounded-md border border-gray-300 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" style="background-color: var(--secondary-bg); border-color: var(--border-color);">
                     View Homework
                 </button>
+                <button id="edit-timetable-btn" class="w-full text-left px-4 py-3 rounded-md border border-gray-300 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" style="background-color: var(--secondary-bg); border-color: var(--border-color);">
+                    Edit Timetalbe
+                </button>
                 <button id="clear-timetable-btn" class="clear-btn w-full text-left px-4 py-3 rounded-md border border-transparent text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
                     Clear Timetable
                 </button>
@@ -593,7 +630,7 @@
             const calendarGrid = document.getElementById('calendar-grid');
             const classModal = document.getElementById('class-modal');
             const classForm = document.getElementById('class-form');
-            const classCloseBtn = document.querySelector('#class-modal .close-btn');
+            const classCloseBtn = document.getElementById('close-add-class-btn');
             const cancelClassBtn = document.getElementById('cancel-class-btn');
             const confirmationMessage = document.getElementById('confirmation-message');
 
@@ -614,6 +651,7 @@
             const settingsCloseBtn = document.getElementById('close-settings-btn');
             const clearTimetableBtn = document.getElementById('clear-timetable-btn');
             const viewHomeworkBtn = document.getElementById('view-homework-btn');
+            const editTimetableBtn = document.getElementById('edit-timetable-btn');
 
             const confirmationModal = document.getElementById('confirmation-modal');
             const confirmClearBtn = document.getElementById('confirm-clear-btn');
@@ -629,7 +667,9 @@
 
             let selectedDay = '';
             let selectedTime = '';
-            const cellHeight = 64;
+            const root = document.documentElement;
+            const computedStyle = getComputedStyle(root);
+            const cellHeight = parseFloat(computedStyle.getPropertyValue('--cell-height')) * 16; 
 
             // Use a full week array to map the Date().getDay() method, then filter for the timetable days.
             const fullDaysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -639,6 +679,7 @@
             const prevDayBtn = document.getElementById('prev-day-btn');
             const nextDayBtn = document.getElementById('next-day-btn');
             const timeLabels = document.querySelectorAll('.time-label');
+            const timeTrackerLine = document.getElementById('time-tracker-line');
 
             let classes = {};
             let homeworks = [];
@@ -711,12 +752,15 @@
              * @param {string} day The selected day.
              * @param {string} time The selected time.
              */
-            function openClassModal(day, time) {
+            function openClassModal(day, time, subject = "", teacher = "", room = "") {
                 selectedDay = day;
                 selectedTime = time;
                 classModal.style.display = 'flex';
                 const startTimeInput = document.getElementById('start-time');
                 const endTimeInput = document.getElementById('end-time');
+                const subjectInput = document.getElementById('class-subject');
+                const teacherInput = document.getElementById('class-teacher');
+                const roomInput = document.getElementById('class-room');
                 
                 // Set start time
                 startTimeInput.value = time;
@@ -726,6 +770,9 @@
                 const endHour = (startHour + 1) % 24; // Simple increment, wraps at 24.
                 const endHourString = endHour.toString().padStart(2, '0');
                 endTimeInput.value = `${endHourString}:00`;
+                subjectInput.value = subject;
+                teacherInput.value = teacher;
+                roomInput.value = room;
             }
 
             /**
@@ -850,8 +897,8 @@
                             classBox.className = 'class-box';
                             classBox.innerHTML = `
                                 <strong>${classData.subject}</strong>
-                                <div class="text-xs">${classData.teacher ? classData.teacher : ''}</div>
-                                <div class="text-xs">${classData.room ? classData.room : ''}</div>
+                                <div class="text-s">${classData.teacher ? classData.teacher : ''}</div>
+                                <div class="text-s">${classData.room ? classData.room : ''}</div>
                             `;
 
                             // Set the background color based on the saved color
@@ -933,6 +980,11 @@
                 const dayHeaders = document.querySelectorAll('.day-header');
                 const isMobile = window.innerWidth <= 768;
 
+                // Get today's day name and index
+                const today = new Date().getDay();
+                const todayName = fullDaysOfWeek[today];
+                const todayIndex = timetableDays.indexOf(todayName);
+                
                 if (isMobile) {
                     dayHeaders.forEach(header => header.style.display = 'none');
                     dayColumns.forEach(cell => {
@@ -944,12 +996,78 @@
                     });
                     timeLabels.forEach(label => label.style.display = 'flex');
                     dayDisplay.textContent = timetableDays[currentDayIndex];
+
+                    // Show the time tracker line only on the current day's column
+                    if (currentDayIndex === todayIndex) {
+                        timeTrackerLine.style.display = 'block';
+                    } else {
+                        timeTrackerLine.style.display = 'none';
+                    }
                 } else {
                     dayHeaders.forEach(header => header.style.display = 'flex');
                     dayColumns.forEach(cell => cell.style.display = 'block');
+                     // Show the time tracker line only on the current day's column
+                     if (todayIndex > -1) {
+                         timeTrackerLine.style.display = 'block';
+                     } else {
+                         timeTrackerLine.style.display = 'none';
+                     }
                 }
                 renderAllClasses();
             }
+
+            /**
+             * Updates the position of the time tracker line.
+             */
+            function updateTimeTrackerLine() {
+                const now = new Date();
+                const currentHour = now.getHours();
+                const currentMinutes = now.getMinutes();
+
+                // Get today's day name and index
+                const today = now.getDay();
+                const todayName = fullDaysOfWeek[today];
+                const todayIndex = timetableDays.indexOf(todayName);
+
+                // Hide the line if it's outside of the timetable hours or on a weekend
+                if (currentHour < 7 || currentHour > 18 || todayIndex === -1) {
+                    timeTrackerLine.style.display = 'none';
+                    return;
+                }
+
+                // Calculate the top position relative to the grid
+                const startHour = 7;
+                const hoursPassed = currentHour - startHour;
+                const minutesPassed = currentMinutes;
+
+                const header = document.getElementById("header");
+                let headerHeight = header.offsetHeight;               
+
+                let calendarHeader = document.getElementById("calendar-header");
+
+                let calendarHeaderHeight = calendarHeader.offsetHeight;
+
+                const positionPixels = headerHeight - calendarHeaderHeight + (hoursPassed * cellHeight) + (minutesPassed / 60) * cellHeight;
+                timeTrackerLine.style.top = `${positionPixels}px`;
+
+                // For desktop, position it correctly in the today's column
+                if (window.innerWidth > 768) {
+                    const dayColumnWidth = (calendarGrid.clientWidth - 80) / 5; // Total width minus time labels, divided by 5 days
+                    const leftPosition = 80 + (todayIndex * dayColumnWidth);
+                    timeTrackerLine.style.left = `${leftPosition}px`;
+                    timeTrackerLine.style.width = `${dayColumnWidth}px`;
+                } else {
+                    // For mobile, it spans the entire day column
+                    timeTrackerLine.style.left = '80px';
+                    timeTrackerLine.style.width = `calc(100% - 80px)`;
+                }
+               
+                // Show the line
+                timeTrackerLine.style.display = 'block';
+  
+                timeTrackerLine.scrollIntoView();
+            }
+
 
             /**
              * Navigates to the next day in mobile view.
@@ -957,6 +1075,7 @@
             function nextDay() {
                 currentDayIndex = (currentDayIndex + 1) % timetableDays.length;
                 updateVisibility();
+                updateTimeTrackerLine();
             }
 
             /**
@@ -965,6 +1084,7 @@
             function prevDay() {
                 currentDayIndex = (currentDayIndex - 1 + timetableDays.length) % timetableDays.length;
                 updateVisibility();
+                updateTimeTrackerLine();
             }
 
             /**
@@ -980,6 +1100,10 @@
                     dayIndex = 0;
                 }
                 currentDayIndex = dayIndex;
+            }
+
+            function enableEditing() {
+                alert('here');
             }
 
             // --- Event Listeners ---
@@ -1076,12 +1200,16 @@
                 }
             });
 
-            window.addEventListener('resize', updateVisibility);
+            window.addEventListener('resize', () => {
+                updateVisibility();
+                updateTimeTrackerLine();
+            });
 
             // Settings Modal Event Listeners
             settingsBtn.addEventListener('click', openSettingsModal);
             settingsCloseBtn.addEventListener('click', closeSettingsModal);
             viewHomeworkBtn.addEventListener('click', openHomeworkListModal);
+            editTimetableBtn.addEventListener('click', enableEditing);
 
             clearTimetableBtn.addEventListener('click', openConfirmationModal);
 
@@ -1139,6 +1267,11 @@
             setInitialDay(); // Set the calendar to the current day on load
             updateVisibility();
             populateColorSwatches();
+            updateTimeTrackerLine();
+            
+            // Update the time tracker line every minute
+            setInterval(updateTimeTrackerLine, 60000);
+
         });
     </script>
 </body>
