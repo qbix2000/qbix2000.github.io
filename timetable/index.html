@@ -17,6 +17,33 @@
             --border-color: #5d5f77;
             --google-blue: #4285F4;
             --cell-height: 10rem;
+            --danger-color: #ea4335;
+        }
+
+        .font-bold {
+            font-weight: 700;
+        }
+
+        .text-2xl {
+            font-size: 3.5rem;
+            line-height: 2rem;
+        }
+
+        .mb-4 {
+            margin-bottom: 1rem;
+        }
+
+        .p-2 {
+            padding: 0.5rem;
+        }
+
+        .rounded-full {
+            border-radius: 9999px;
+        }
+
+        button {
+            cursor: pointer;
+            background-color: transparent;
         }
 
         /* Apply the new color scheme to the entire body and override some Tailwind defaults */
@@ -138,7 +165,6 @@
             background-color: #c53030;
         }
 
-
         /* Common Styles */
         .calendar-grid {
             display: grid;
@@ -161,9 +187,6 @@
             position: relative;
             cursor: pointer;
             transition: background-color 0.2s ease-in-out;
-        }
-        .calendar-cell:nth-child(5n + 5) {
-            border-right: none;
         }
         .calendar-grid > div:last-child > .calendar-cell {
             border-bottom: none;
@@ -244,6 +267,7 @@
         #confirmation-message {
             background-color: #48bb78;
             color: white;
+            z-index: 90;
         }
 
         /* --- Color Swatch Specific Styles --- */
@@ -356,17 +380,45 @@
             background-color: var(--accent-color);
             border-radius: 50%;
         }
+
+        .hamburger-icon {
+            display: flex; /* Ensure the icon is always displayed */
+            flex-direction: column;
+            justify-content: space-around;
+            width: 30px;
+            height: 25px;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .hamburger-icon .bar {
+            width: 100%;
+            height: 3px;
+            background-color: var(--text-color); /* Bars match text color */
+            border-radius: 5px;
+        }
+        .hamburger-icon .dot {
+            width: 15px;
+            height: 15px;
+            background-color: var(--danger-color); /* Bars match text color */
+            border-radius: 15px;
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            display: none;
+        }
     </style>
 </head>
 <body class="p-8">
     <div class="max-w-7xl mx-auto rounded-xl shadow-lg">
         <header id="header" class="flex justify-between items-center p-6 border-b rounded-t-xl" style="border-bottom-color: var(--border-color);">
-            <!-- Hamburger menu button -->
-            <button id="settings-btn" class="text-gray-500 hover:text-gray-200 transition focus:outline-none">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
-                </svg>
-            </button>
+            <label id="settings-btn" class="hamburger-icon">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span id="homework-indicator" class="dot"></span>
+            </label>
+
             <h1 class="text-3xl font-bold">Timetable</h1>
             <!-- Placeholder for alignment on desktop -->
             <div class="w-8"></div>
@@ -495,7 +547,7 @@
             <div id="close-add-class-btn">
                 <span class="close-btn" >&times;</span>
             </div>
-            <h2 class="text-2xl font-bold mb-4">Add Class</h2>
+            <h2 id="class-modal-title" class="text-2xl font-bold mb-4">Add Class</h2>
             <form id="class-form" class="space-y-4">
                 <div>
                     <label for="class-subject" class="block font-medium">Subject</label>
@@ -522,13 +574,17 @@
                     <div class="color-swatch-container mt-1" id="color-swatch-container">
                         <!-- Color swatches will be populated here by JavaScript -->
                     </div>
-                    <input type="hidden" id="class-color" name="color" value="#f2b64b"> <!-- Hidden input to store the selected color -->
+                    <input type="hidden" id="class-color" name="color" value="#f2b64b">
+                    <input type="hidden" id="class-id" name="id"><!-- Hidden input to store the selected color -->
                 </div>
                 <div class="flex justify-end">
-                    <button type="button" id="cancel-class-btn" class="cancel-btn mr-2 px-4 py-2 rounded-md border text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <button type="button" id="cancel-class-btn" class="cancel-btn mr-2 px-4 py-2 rounded-md border font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                         Cancel
                     </button>
-                    <button type="submit" class="save-btn px-4 py-2 rounded-md border border-transparent text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-google-blue">
+                    <button type="button" id="delete-class-btn" class="clear-btn mr-2 px-4 py-2 rounded-md border border-transparent font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 hidden">
+                    Delete
+                </button>
+                    <button type="submit" class="save-btn px-4 py-2 rounded-md border border-transparent font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-google-blue">
                         Save Class
                     </button>
                 </div>
@@ -540,10 +596,10 @@
     <div id="homework-modal" class="modal">
         <div class="modal-content rounded-xl p-6">
             <span class="close-btn" id="close-homework-btn">&times;</span>
-            <h2 class="text-2xl font-bold mb-4">Add Homework</h2>
+            <h1 class="text-2xl font-bold mb-4">Add Homework</h1>
             <form id="homework-form" class="space-y-4">
                 <div>
-                    <label for="homework-subject" class="block font-medium">Subject</label>
+                    <label for="homework-subject" class="block font-large">Subject</label>
                     <input type="text" id="homework-subject" name="subject" readonly class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-gray-900" style="background-color: var(--secondary-bg); border-color: var(--border-color); color: var(--text-color);">
                 </div>
                 <div>
@@ -555,10 +611,10 @@
                     <textarea id="homework-description" name="homework" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-gray-900" rows="4" style="background-color: var(--secondary-bg); border-color: var(--border-color); color: var(--text-color);"></textarea>
                 </div>
                 <div class="flex justify-end">
-                    <button type="button" id="cancel-homework-btn" class="cancel-btn mr-2 px-4 py-2 rounded-md border text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <button type="button" id="cancel-homework-btn" class="cancel-btn mr-2 px-4 py-2 rounded-md border font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                         Cancel
                     </button>
-                    <button type="submit" class="save-btn px-4 py-2 rounded-md border border-transparent text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-google-blue">
+                    <button type="submit" class="clear-btn px-4 py-2 rounded-md border border-transparent font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-google-blue">
                         Save Homework
                     </button>
                 </div>
@@ -566,20 +622,22 @@
         </div>
     </div>
 
-
     <!-- Settings Modal -->
     <div id="settings-modal" class="modal">
         <div class="modal-content rounded-xl p-6">
             <span class="close-btn" id="close-settings-btn">&times;</span>
             <h2 class="text-2xl font-bold mb-4">Settings</h2>
             <div class="space-y-4">
-                <button id="view-homework-btn" class="w-full text-left px-4 py-3 rounded-md border border-gray-300 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" style="background-color: var(--secondary-bg); border-color: var(--border-color);">
+                <button id="view-homework-btn" class="w-full text-left px-4 py-3 rounded-md border border-gray-300 font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" style="background-color: var(--secondary-bg); border-color: var(--border-color);">
                     View Homework
                 </button>
-                <button id="edit-timetable-btn" class="w-full text-left px-4 py-3 rounded-md border border-gray-300 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" style="background-color: var(--secondary-bg); border-color: var(--border-color);">
-                    Edit Timetalbe
+                <button id="edit-timetable-btn" class="w-full text-left px-4 py-3 rounded-md border border-gray-300 font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" style="background-color: var(--secondary-bg); border-color: var(--border-color);">
+                    Edit Timetable
                 </button>
-                <button id="clear-timetable-btn" class="clear-btn w-full text-left px-4 py-3 rounded-md border border-transparent text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                <button id="lock-timetable-btn" class="w-full text-left px-4 py-3 rounded-md border border-gray-300 font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" style="background-color: var(--secondary-bg); border-color: var(--border-color);display: none;">
+                    Lock Timetable
+                </button>
+                <button id="clear-timetable-btn" class="clear-btn w-full text-left px-4 py-3 rounded-md border border-transparent font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
                     Clear Timetable
                 </button>
             </div>
@@ -595,8 +653,8 @@
                 <!-- Homework items will be dynamically inserted here -->
             </div>
             <div class="mt-4 flex flex-col items-center justify-center space-y-2">
-                <button id="clear-completed-btn" class="px-4 py-2 rounded-md border border-transparent text-sm font-medium shadow-sm">
-                    Clear Completed <span id="completed-count" class="ml-2 font-bold">(0)</span>
+                <button id="clear-completed-btn" class="px-4 py-2 rounded-md border border-transparent font-medium shadow-sm">
+                    Clear Completed <span id="completed-count" class="ml-2 font-large">(0)</span>
                 </button>
             </div>
         </div>
@@ -608,10 +666,10 @@
             <h3 class="text-xl font-bold mb-4">Are you sure?</h3>
             <p class="mb-6">This will permanently delete all classes from your timetable.</p>
             <div class="flex justify-center space-x-4">
-                <button id="confirm-clear-btn" class="px-4 py-2 rounded-md border border-transparent text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                <button id="confirm-clear-btn" class="px-4 py-2 rounded-md border border-transparent font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
                     Yes, clear it
                 </button>
-                <button id="cancel-clear-btn" class="cancel-btn px-4 py-2 rounded-md border text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <button id="cancel-clear-btn" class="cancel-btn px-4 py-2 rounded-md border font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                     No, cancel
                 </button>
             </div>
@@ -632,6 +690,7 @@
             const classForm = document.getElementById('class-form');
             const classCloseBtn = document.getElementById('close-add-class-btn');
             const cancelClassBtn = document.getElementById('cancel-class-btn');
+            const deleteClassBtn = document.getElementById('delete-class-btn');
             const confirmationMessage = document.getElementById('confirmation-message');
 
             const homeworkModal = document.getElementById('homework-modal');
@@ -652,6 +711,7 @@
             const clearTimetableBtn = document.getElementById('clear-timetable-btn');
             const viewHomeworkBtn = document.getElementById('view-homework-btn');
             const editTimetableBtn = document.getElementById('edit-timetable-btn');
+            const lockTimetableBtn = document.getElementById('lock-timetable-btn');
 
             const confirmationModal = document.getElementById('confirmation-modal');
             const confirmClearBtn = document.getElementById('confirm-clear-btn');
@@ -681,6 +741,7 @@
             const timeLabels = document.querySelectorAll('.time-label');
             const timeTrackerLine = document.getElementById('time-tracker-line');
 
+            let isEditing = false;
             let classes = {};
             let homeworks = [];
 
@@ -752,27 +813,28 @@
              * @param {string} day The selected day.
              * @param {string} time The selected time.
              */
-            function openClassModal(day, time, subject = "", teacher = "", room = "") {
+            function openClassModal(title, day, startTime, endTime, subject = "", teacher = "", room = "", id = "", colour = "#f2b64b") {
                 selectedDay = day;
-                selectedTime = time;
+                selectedTime = startTime;
                 classModal.style.display = 'flex';
                 const startTimeInput = document.getElementById('start-time');
                 const endTimeInput = document.getElementById('end-time');
                 const subjectInput = document.getElementById('class-subject');
                 const teacherInput = document.getElementById('class-teacher');
                 const roomInput = document.getElementById('class-room');
+                const classId = document.getElementById('class-id');
+                const classColour = document.getElementById('class-color');
+                const classTitle = document.getElementById('class-modal-title');
                 
                 // Set start time
-                startTimeInput.value = time;
-
-                // Calculate and set end time to the next hour
-                const startHour = parseInt(time.split(':')[0], 10);
-                const endHour = (startHour + 1) % 24; // Simple increment, wraps at 24.
-                const endHourString = endHour.toString().padStart(2, '0');
-                endTimeInput.value = `${endHourString}:00`;
+                startTimeInput.value = startTime;
+                endTimeInput.value = endTime;
                 subjectInput.value = subject;
                 teacherInput.value = teacher;
                 roomInput.value = room;
+                classId.value = id;
+                classColour.value = classColour;
+                classTitle.innerHTML = title;
             }
 
             /**
@@ -781,6 +843,10 @@
             function closeClassModal() {
                 classModal.style.display = 'none';
                 classForm.reset();
+            }
+
+            function deleteClass() {
+                alert("here");
             }
 
             /**
@@ -865,6 +931,14 @@
                         }
                         return hw;
                     });
+                    let outstandingHomework = homeworks.map(homework => {
+                            if(!homework.isDone) {
+                                return homework;
+                            }
+                            return null;
+                    });
+                       
+                    document.getElementById("homework-indicator").style.display =  outstandingHomework.length > 0 ? "block" : "none";
                 } else {
                     homeworks = [];
                 }
@@ -904,6 +978,12 @@
                             // Set the background color based on the saved color
                             classBox.style.backgroundColor = classData.color;
                             classBox.dataset.subject = classData.subject;
+                            classBox.dataset.teacher = classData.teacher;
+                            classBox.dataset.room = classData.room;
+                            classBox.dataset.id = classData.id;
+                            classBox.dataset.startTime = classData.startTime;
+                            classBox.dataset.endTime = classData.endTime;
+                            classBox.dataset.color = classData.color;
 
                             const startHours = parseInt(classData.startTime.split(':')[0]);
                             const startMinutes = parseInt(classData.startTime.split(':')[1]);
@@ -963,9 +1043,9 @@
                     homeworkItem.innerHTML = `
                         <input type="checkbox" ${hw.isDone ? 'checked' : ''} data-id="${hw.id}" class="mr-3 h-5 w-5 text-google-blue rounded focus:ring-google-blue">
                         <div>
-                            <h4 class="font-bold">${hw.subject}</h4>
-                            <p class="text-sm my-1">${hw.homework}</p>
-                            <small>Due: ${new Date(hw.dueDate).toDateString()}</small>
+                            <h1 class="font-bold text-l">${hw.subject}</h1>
+                            <p>${hw.homework}</p>
+                            <p>Due: ${new Date(hw.dueDate).toDateString()}</p>
                         </div>
                     `;
                     homeworkListContainer.appendChild(homeworkItem);
@@ -1101,7 +1181,17 @@
             }
 
             function enableEditing() {
-                alert('here');
+                isEditing = true;
+                lockTimetableBtn.style.display = 'block';
+                editTimetableBtn.style.display = 'none';
+                closeSettingsModal();
+            }
+
+            function lockEditing() {
+                isEditing = false;
+                lockTimetableBtn.style.display = 'none';
+                editTimetableBtn.style.display = 'block';
+                closeSettingsModal();
             }
 
             // --- Event Listeners ---
@@ -1111,21 +1201,28 @@
             calendarGrid.addEventListener('click', (e) => {
                 const cell = e.target.closest('.calendar-cell');
                 const classBox = e.target.closest('.class-box');
+                const day = cell.dataset.day;
+                const time = cell.dataset.time;
 
-                if (classBox) {
+                if(classBox && isEditing) {
+                    openClassModal("Edit Class", day, classBox.dataset.startTime, classBox.dataset.endTime, classBox.dataset.subject, classBox.dataset.teacher, classBox.dataset.room, classBox.dataset.id, classBox.dataset.color);
+
+                } else if (classBox) {
                     // If a class box is clicked, open the homework modal
                     const subject = classBox.dataset.subject;
                     openHomeworkModal(subject);
-                } else if (cell && !cell.classList.contains('occupied')) {
-                    // If an empty cell is clicked, open the class modal
-                    const day = cell.dataset.day;
-                    const time = cell.dataset.time;
-                    openClassModal(day, time);
+                } else if (cell && !cell.classList.contains('occupied') && isEditing) {
+                    const startHour = parseInt(time.split(':')[0], 10);
+                    const endHour = (startHour + 1) % 24; // Simple increment, wraps at 24.
+                    const endHourString = endHour.toString().padStart(2, '0');
+                    endTime = `${endHourString}:00`;
+                    openClassModal("Add Class", day, time, endTime);
                 }
             });
 
             classCloseBtn.addEventListener('click', closeClassModal);
             cancelClassBtn.addEventListener('click', closeClassModal);
+            deleteClassBtn.addEventListener('click', deleteClass);
             homeworkCloseBtn.addEventListener('click', closeHomeworkModal);
             cancelHomeworkBtn.addEventListener('click', closeHomeworkModal);
             homeworkListCloseBtn.addEventListener('click', closeHomeworkListModal);
@@ -1145,14 +1242,32 @@
                     return;
                 }
 
-                classes[selectedDay].push({
+                 // Find the index of an existing class with the same subject
+                const existingClassIndex = classes[selectedDay].findIndex(c => c.id === classData.id);
+
+                // Prepare the new or updated class object.
+                const newClass = {
+                    // If an existing class was found, keep its ID. Otherwise, generate a new one.
+                    id: existingClassIndex !== -1 ? classes[selectedDay][existingClassIndex].id : generateUniqueId(),
                     subject: classData.subject,
                     teacher: classData.teacher,
                     room: classData.room,
                     startTime: classData.startTime,
                     endTime: classData.endTime,
                     color: classData.color
-                });
+                };
+            
+                // Check if a class with this subject already exists
+                if (existingClassIndex !== -1) {
+                    // If it exists, overwrite the old object with the new one
+                    classes[selectedDay][existingClassIndex] = newClass;
+                    // You could also add a message here to confirm the update
+                    showMessage(confirmationMessage, "Class updated!");
+                } else {
+                    // If it does not exist, add a new one to the array
+                    classes[selectedDay].push(newClass);
+                    showMessage(confirmationMessage, "Class saved!");
+                }
 
                 saveData(); // Save the updated data to local storage
                 closeClassModal();
@@ -1177,6 +1292,7 @@
                 saveData(); // Save the updated data to local storage
                 closeHomeworkModal();
                 showMessage(confirmationMessage, "Homework saved!");
+                loadData();
             });
 
 
@@ -1208,6 +1324,7 @@
             settingsCloseBtn.addEventListener('click', closeSettingsModal);
             viewHomeworkBtn.addEventListener('click', openHomeworkListModal);
             editTimetableBtn.addEventListener('click', enableEditing);
+            lockTimetableBtn.addEventListener('click', lockEditing);
 
             clearTimetableBtn.addEventListener('click', openConfirmationModal);
 
@@ -1258,6 +1375,7 @@
 
                 // Show a confirmation message to the user
                 showMessage(confirmationMessage, "Completed homework cleared!");
+                loadData();
             });
 
             // Initial setup
