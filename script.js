@@ -197,6 +197,7 @@ function clearRoutineData() {
     totalTime = 0;
     timePassed = 0;
     timerId = null;
+    document.getElementById("nextSetName").style.visibility = "";
 }
 
 function incrementRound() {
@@ -206,7 +207,7 @@ function incrementRound() {
         announce(finish);
         timerId = null;
         document.getElementById("setName").textContent = finish;
-        document.getElementById("nextSetName").textContent = "";
+        document.getElementById("nextSetName").style.visibility = "hidden";
         return;
     }
 
@@ -260,7 +261,14 @@ function setNextSetName(routine, currentRoundNumber, currentSetNumber) {
 
     let nextSetName = routine.sets[nextSetNumber].setName;
 
-    if(currentRoundNumber - 1 == routine.rounds.length && currentSetNumber + 1 == routine.sets.length) {
+    let text = `Current round number = ${currentRoundNumber}
+                Rountines rounds = ${routine.rounds}
+                Current set number = ${currentSetNumber}
+                Routines sets = ${routine.sets.length}`;
+
+   // alert(text);
+
+    if(currentRoundNumber == routine.rounds && currentSetNumber + 1 == routine.sets.length) {
         nextSetName = finish;
     }
 
