@@ -78,10 +78,8 @@
             font-weight: inherit;
         }
 
-        @media (min-width: 768px) {
-            .md\:hidden {
-                display: none;
-            }
+        .bg-white {
+            background-color: var(--secondary-bg);
         }
 
         .block {
@@ -176,12 +174,20 @@
             margin-bottom: 1.5rem;
         }
 
+        .mr-1 {
+            margin-right: 0.5rem;
+        }
+
         .mr-2 {
             margin-right: 0.5rem;
         }
 
         .mr-3 {
             margin-right: 0.75rem;
+        }
+
+        .mr-4 {
+            margin-right: 1rem;
         }
 
         .mt-1 {
@@ -252,6 +258,12 @@
             box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
         }
 
+        .space-x-4 > :not([hidden]) ~ :not([hidden]) {
+            --tw-space-x-reverse: 0;
+            margin-right: calc(1rem * var(--tw-space-x-reverse));
+            margin-left: calc(1rem * calc(1 - var(--tw-space-x-reverse)));
+        }
+
         .space-y-4 > :not([hidden]) ~ :not([hidden]) {
             margin-top: 1rem; /* 16px */
         }
@@ -262,14 +274,20 @@
             margin-bottom: calc(1rem * var(--tw-space-y-reverse));
         }
 
-        .space-x-4 > :not([hidden]) ~ :not([hidden]) {
-            --tw-space-x-reverse: 0;
-            margin-right: calc(1rem * var(--tw-space-x-reverse));
-            margin-left: calc(1rem * calc(1 - var(--tw-space-x-reverse)));
-        }
-
          .text-center {
             text-align: center;
+        }
+        
+        .text-gray-300 {
+            color: var(--border-color);
+        }
+
+        .text-gray-700 {
+            color: var(--text-color);
+        }
+
+        .text-gray-900 {
+            color: var(--text-color);
         }
 
         .text-left {
@@ -299,188 +317,53 @@
             width: 1.25rem;
         }
 
-        .calendar-grid {
-            border: 1px solid var(--border-color);
-            background-color: var(--primary-bg);
-            position: relative; /* Essential for positioning the time tracker line */
-        }
-        .time-label {
-            color: var(--text-color);
-            border-bottom: 1px solid var(--border-color);
-            border-right: 1px solid var(--border-color);
-        }
+
         .calendar-cell {
+            height: var(--cell-height);
+            padding: 0.5rem;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
             border-bottom: 1px solid var(--border-color);
             border-right: 1px solid var(--border-color);
         }
+
+        
         .calendar-cell:hover {
             background-color: var(--secondary-bg);
         }
-        .day-header, .day-header-placeholder {
-            color: var(--text-color);
-            background-color: var(--secondary-bg);
-            border-bottom: 1px solid var(--border-color);
-            border-right: 1px solid var(--border-color);
-        }
-        .day-header-placeholder {
-            border-right: 1px solid var(--border-color);
-        }
-        .modal-content {
-            background-color: var(--primary-bg);
-            color: var(--text-color);
-        }
-        .class-box {
-            background-color: #63b3ed; /* Use a default color that will be replaced */
-            color: white;
-        }
-        .text-gray-900 {
-            color: var(--text-color);
-        }
-        .text-gray-700 {
-            color: var(--text-color);
-        }
-        .text-gray-300 {
-            color: var(--border-color);
-        }
 
-        .bg-white {
-            background-color: var(--secondary-bg);
-        }
-        .cancel-btn {
-            color: var(--text-color);
-            border-color: var(--border-color);
-            background-color: transparent;
-        }
-        .cancel-btn:hover {
-            background-color: var(--secondary-bg);
-        }
+
         .calendar-cell.occupied {
             cursor: pointer; /* Change cursor to pointer for homework modal */
             background-color: #2b2d42;
         }
-        .class-form input, .class-form select, .homework-form input, .homework-form textarea {
-            background-color: var(--secondary-bg);
-            border-color: var(--border-color);
-            color: var(--text-color);
-        }
-        .save-btn {
-            background-color: var(--google-blue);
-            color: white;
-        }
-        .save-btn:hover {
-            background-color: #3c77e7;
-        }
-        .clear-btn {
-            background-color: var(--accent-color);
-            color: #2b2d42;
-        }
-        .clear-btn:hover {
-            background-color: #f2c77d;
-        }
-        .homework-list-item {
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-        }
-        .homework-list-item:last-child {
+
+
+        .calendar-grid > div:last-child > .calendar-cell {
             border-bottom: none;
         }
 
-        /* New style for completed homework */
-        .homework-list-item.done h4, .homework-list-item.done p, .homework-list-item.done small {
-            text-decoration: line-through;
-            color: #888;
-        }
-        .homework-list-item .done-checkbox {
-            color: var(--google-blue);
-        }
-        #clear-completed-btn {
-            background-color: #ef4444; /* A red color */
-            color: white;
-        }
-        #clear-completed-btn:hover {
-            background-color: #dc2626;
-        }
-        /* --- Confirmation Modal specific button styles --- */
-        #confirm-clear-btn {
-            background-color: #e53e3e;
-        }
-        #confirm-clear-btn:hover {
-            background-color: #c53030;
-        }
-
-        /* Common Styles */
         .calendar-grid {
             display: grid;
             grid-template-columns: 80px repeat(5, 1fr);
             border-radius: 0.5rem;
             overflow: hidden;
-        }
-        .time-label {
-            height: var(--cell-height); /* 60% taller */
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            padding-right: 1rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
-        .calendar-cell {
-            height: var(--cell-height); /* 60% taller */
-            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            background-color: var(--primary-bg);
             position: relative;
-            cursor: pointer;
-            transition: background-color 0.2s ease-in-out;
         }
-        .calendar-grid > div:last-child > .calendar-cell {
-            border-bottom: none;
+
+        .cancel-btn {
+            color: var(--text-color);
+            border-color: var(--border-color);
+            background-color: transparent;
         }
-        .day-header {
-            height: 4.8rem; /* 60% taller */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            border-right: 1px solid;
+
+        .cancel-btn:hover {
+            background-color: var(--secondary-bg);
         }
-        .day-header:last-child {
-            border-right: none;
-        }
-        .day-header-placeholder {
-            height: 4.8rem; /* 60% taller */
-            border-right: 1px solid;
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 100;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.6);
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            padding: 20px;
-            border-radius: 0.75rem;
-            width: 90%;
-            max-height: 90%;
-            overflow: auto;
-            max-width: 500px;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-        }
-        .close-btn {
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-        .close-btn:hover, .close-btn:focus {
-            text-decoration: none;
-            cursor: pointer;
-        }
+
         .class-box {
             position: absolute;
             font-size: 1.3rem; /* 60% bigger */
@@ -495,7 +378,159 @@
             z-index: 10;
             color: white;
             cursor: pointer;
+            background-color: #63b3ed;
         }
+
+        .class-form input, .class-form select, .homework-form input, .homework-form textarea {
+            background-color: var(--secondary-bg);
+            border-color: var(--border-color);
+            color: var(--text-color);
+        }
+
+        .clear-btn {
+            background-color: var(--accent-color);
+            color: #2b2d42;
+        }
+
+        .clear-btn:hover {
+            background-color: #f2c77d;
+        }
+
+        .close-btn {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close-btn:hover, .close-btn:focus {
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .color-swatch {
+            width: 100%;
+            padding-bottom: 100%; /* Creates a square aspect ratio */
+            border-radius: 0.375rem; /* rounded-md */
+            cursor: pointer;
+            position: relative;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
+            border: 2px solid transparent;
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .color-swatch-container {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 0.5rem;
+        }
+
+        .color-swatch.selected {
+            border: 2px solid var(--google-blue);
+        }
+
+        .color-swatch.selected::after {
+            content: '✔';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--text-color);
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        .day-header {
+            height: 4.8rem; /* 60% taller */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            border-right: 1px solid;
+        }
+
+        .day-header:last-child {
+            border-right: none;
+        }
+
+        .day-header-placeholder {
+            height: 4.8rem; /* 60% taller */
+            border-right: 1px solid;
+        }
+
+        .day-header, .day-header-placeholder {
+            color: var(--text-color);
+            background-color: var(--secondary-bg);
+            border-bottom: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+        }
+
+        .day-header-placeholder {
+            border-right: 1px solid var(--border-color);
+        }
+
+        .hamburger-icon {
+            display: flex; /* Ensure the icon is always displayed */
+            flex-direction: column;
+            justify-content: space-around;
+            width: 30px;
+            height: 25px;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .hamburger-icon .bar {
+            width: 100%;
+            height: 3px;
+            background-color: var(--text-color); /* Bars match text color */
+            border-radius: 5px;
+        }
+        .hamburger-icon .dot {
+            width: 15px;
+            height: 15px;
+            background-color: var(--danger-color); /* Bars match text color */
+            border-radius: 15px;
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            display: none;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .homework-list-item h4 {
+            margin-bottom: 0.25rem;
+        }
+
+        .homework-list-item p {
+            margin-top: 0;
+        }
+
+        .homework-list-item {
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+        }
+
+        .homework-list-item:last-child {
+            border-bottom: none;
+        }
+
+        .homework-list-item.done h4, .homework-list-item.done p, .homework-list-item.done small {
+            text-decoration: line-through;
+            color: #888;
+        }
+
+        .homework-list-item .done-checkbox {
+            color: var(--google-blue);
+        }
+
         .message-box {
             position: fixed;
             top: 2rem;
@@ -510,55 +545,112 @@
             align-items: center;
             space-x: 0.5rem;
         }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            padding: 20px;
+            border-radius: 0.75rem;
+            width: 90%;
+            max-height: 90%;
+            overflow: auto;
+            max-width: 500px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+        }
+
+        .save-btn {
+            background-color: var(--google-blue);
+            color: white;
+        }
+
+        .save-btn:hover {
+            background-color: #3c77e7;
+        }
+
+        .time-label {
+            height: var(--cell-height);
+            color: var(--text-color);
+            border-bottom: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+
+        #clear-completed-btn {
+            background-color: #ef4444; /* A red color */
+            color: white;
+        }
+
+        #clear-completed-btn:hover {
+            background-color: #dc2626;
+        }
+
+        #confirm-clear-btn {
+            background-color: #e53e3e;
+        }
+
+        #confirm-clear-btn:hover {
+            background-color: #c53030;
+        }
+
         #confirmation-message {
             background-color: #48bb78;
             color: white;
             z-index: 90;
         }
 
-        /* --- Color Swatch Specific Styles --- */
-        .color-swatch-container {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 0.5rem;
-        }
-        .color-swatch {
-            width: 100%;
-            padding-bottom: 100%; /* Creates a square aspect ratio */
-            border-radius: 0.375rem; /* rounded-md */
-            cursor: pointer;
-            position: relative;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-            transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
-            border: 2px solid transparent;
-        }
-        .color-swatch:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .color-swatch.selected {
-            border: 2px solid var(--google-blue);
-        }
-        .color-swatch.selected::after {
-            content: '✔';
+        #time-tracker-line {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: var(--text-color);
-            font-size: 1rem;
-            font-weight: bold;
+            width: calc(100% - 80px); /* Span across the day columns */
+            left: 80px;
+            height: 2px;
+            background-color: var(--accent-color); /* A bright, visible color */
+            z-index: 50; /* Ensure the line is on top of other elements */
+            pointer-events: none; /* Make sure the line doesn't block clicks */
+            display: none; /* Hidden by default, shown for the current day */
         }
         
-        .homework-list-item h4 {
-            margin-bottom: 0.25rem;
+        #time-tracker-line::before {
+            content: '';
+            position: absolute;
+            left: -8px; /* Position the dot slightly to the left of the line */
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            background-color: var(--accent-color);
+            border-radius: 50%;
         }
-        .homework-list-item p {
-            margin-top: 0;
+
+        @media (min-width: 768px) {
+            .md\:block {
+                display: block;
+            }
         }
-        .homework-list-item small {
-            color: var(--text-color);
-            font-size: 0.75rem;
+
+        @media (min-width: 768px) {
+            .md\:hidden {
+                display: none;
+            }
         }
 
         /* --- Responsive Styles for Mobile --- */
@@ -603,58 +695,9 @@
             }
         }
 
-        /* --- Time Tracker Line Styles --- */
-        #time-tracker-line {
-            position: absolute;
-            width: calc(100% - 80px); /* Span across the day columns */
-            left: 80px;
-            height: 2px;
-            background-color: var(--accent-color); /* A bright, visible color */
-            z-index: 50; /* Ensure the line is on top of other elements */
-            pointer-events: none; /* Make sure the line doesn't block clicks */
-            display: none; /* Hidden by default, shown for the current day */
-        }
-        
-        #time-tracker-line::before {
-            content: '';
-            position: absolute;
-            left: -8px; /* Position the dot slightly to the left of the line */
-            top: 50%;
-            transform: translateY(-50%);
-            width: 16px;
-            height: 16px;
-            background-color: var(--accent-color);
-            border-radius: 50%;
-        }
-
-        .hamburger-icon {
-            display: flex; /* Ensure the icon is always displayed */
-            flex-direction: column;
-            justify-content: space-around;
-            width: 30px;
-            height: 25px;
-            cursor: pointer;
-            position: relative;
-        }
-        
-        .hamburger-icon .bar {
-            width: 100%;
-            height: 3px;
-            background-color: var(--text-color); /* Bars match text color */
-            border-radius: 5px;
-        }
-        .hamburger-icon .dot {
-            width: 15px;
-            height: 15px;
-            background-color: var(--danger-color); /* Bars match text color */
-            border-radius: 15px;
-            position: absolute;
-            bottom: -5px;
-            right: -5px;
-            display: none;
-        }
         
     </style>
+
 </head>
 <body class="p-8">
     <div class="max-w-7xl mx-auto rounded-xl shadow-lg">
