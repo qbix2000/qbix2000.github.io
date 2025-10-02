@@ -15,6 +15,9 @@ const pageBackgroundColor = bodyStyles.getPropertyValue('--background-color');
 const activeColour = bodyStyles.getPropertyValue('--danger-color');
 const restColour = bodyStyles.getPropertyValue('--primary-color');
 
+const editLink = document.getElementById('edit-link');
+const endEditLink = document.getElementById('end-edit-link');
+
 let routine = {}
 
 let setNumber = 0;
@@ -55,23 +58,49 @@ function saveRoutine() {
     }
 
     saveRoutines();
+    showRoutines();
 }
 
 function saveRoutines() {
     const jsonString = JSON.stringify(routines);
 
     localStorage.setItem('routines', jsonString);
-
-    showRoutines();
 }
 
 function cancelRoutine() {
     showRoutines();
 }
 
+function editRoutines() {
+    toggleRoutineEditing();
+    toggleMenu();
+}
+
+function endEditingRoutines() {
+    toggleRoutineEditing();
+    toggleMenu();
+}
+
+function toggleMenu() {
+    editLink.classList.toggle('nav-link-hidden'); 
+    endEditLink.classList.toggle('nav-link-hidden');
+}
+
+function toggleRoutineEditing() {
+    let cells = document.getElementsByClassName("hidden-table-cell");
+
+    for(let i = 0; i < cells.length; i++) {
+        cells[i].classList.toggle('visible-table-cell');
+    }
+
+    menuToggle.checked = false;
+}
+
 function showRoutines() {
     showContainer("routines-container");
     loadRoutines();
+    editLink.classList.remove('nav-link-hidden'); 
+    endEditLink.classList.add('nav-link-hidden');
 }
 
 function createRoutine() {
@@ -265,8 +294,6 @@ function setNextSetName(routine, currentRoundNumber, currentSetNumber) {
                 Rountines rounds = ${routine.rounds}
                 Current set number = ${currentSetNumber}
                 Routines sets = ${routine.sets.length}`;
-
-   // alert(text);
 
     if(currentRoundNumber == routine.rounds && currentSetNumber + 1 == routine.sets.length) {
         nextSetName = finish;
@@ -515,7 +542,66 @@ let defaultRoutines = [
              ]
             }
         ]
-    }
+    },
+  {
+    "id": "1ff46c73-0e96-4505-9f93-5f0279c2e78c",
+    "title": "Bodyweight tabata",
+    "rounds": "3",
+    "sets": [
+      {
+        "setName": "Jumping jacks",
+        "intervals": [
+          {
+            "duration": 45,
+            "type": "active"
+          },
+          {
+            "duration": 15,
+            "type": "rest"
+          }
+        ]
+      },
+      {
+        "setName": "High knees",
+        "intervals": [
+          {
+            "duration": 45,
+            "type": "active"
+          },
+          {
+            "duration": 15,
+            "type": "rest"
+          }
+        ]
+      },
+      {
+        "setName": "Mountain climbers",
+        "intervals": [
+          {
+            "duration": 45,
+            "type": "active"
+          },
+          {
+            "duration": 15,
+            "type": "rest"
+          }
+        ]
+      },
+      {
+        "setName": "Burpees",
+        "intervals": [
+          {
+            "duration": 45,
+            "type": "active"
+          },
+          {
+            "duration": 15,
+            "type": "rest"
+          }
+        ]
+      }
+    ]
+  }
 ];
 
 let routines = [];
@@ -538,13 +624,13 @@ function loadRoutines() {
         let routine = routines[i];
 
         routinesContainer.insertAdjacentHTML('beforeend', `
-                    <div class="routines-table-row">
-                        <div class="routines-table-cell" onclick="editRoutine(${i});"><h2>✏</h2></div>
+                    <div class="routines-table-row" id="routine-${i}">
+                        <div class="routines-table-cell hidden-table-cell" onclick="editRoutine(${i});"><h2>✏</h2></div>
                         <div class="routines-table-cell" onclick="loadSelectedRoutine(${i});">
                             <h2>${routine.title}</h2>
                             <p>Total time: ${calculateRoutineLength(routine)}</p>
                         </div>
-                         <div class="routines-table-cell" onclick="deleteRoutine(${i});"><h2>🗑</h2></div>
+                         <div class="routines-table-cell hidden-table-cell" onclick="deleteRoutine(${i});"><h2>🗑</h2></div>
                     </div>
                     `);
     }
@@ -611,6 +697,8 @@ function deleteRoutine(routineNumber) {
     if (confirm(`Are you sure you want to delete ${routineToDelete.title}?`)) {
     
         routines.splice(routineNumber, 1);
+        let routineRow = document.getElementById('routine-' + routineNumber);
+        routineRow.style.display = 'none';
 
         saveRoutines();
     }
@@ -641,6 +729,7 @@ function processFile() {
         routines = routines.concat(parsedJsonObject);
 
         saveRoutines();
+        showRoutines();
     };
 
     reader.onerror = function(e) {
