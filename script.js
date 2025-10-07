@@ -72,6 +72,7 @@ function cancelRoutine() {
 }
 
 function editRoutines() {
+    showRoutines();
     toggleRoutineEditing();
     toggleMenu();
 }
@@ -97,19 +98,24 @@ function toggleRoutineEditing() {
 }
 
 function showRoutines() {
+    endEditing();
     showContainer("routines-container");
     loadRoutines();
-    editLink.classList.remove('nav-link-hidden'); 
-    endEditLink.classList.add('nav-link-hidden');
 }
 
 function createRoutine() {
+    endEditing();
     showContainer("routine-container");
     setNumber = 0;
     document.getElementById("routineId").value = "";
     document.getElementById("newRoutineName").value = "";
     document.getElementById("numberOfRounds").value = "1";
     document.getElementById("sets").innerHTML = "";
+}
+
+function endEditing() {
+    editLink.classList.remove('nav-link-hidden'); 
+    endEditLink.classList.add('nav-link-hidden');
 }
 
 async function loadSelectedRoutine(routineNumber) {
@@ -161,6 +167,7 @@ function endWakeLock() {
 
 
 function showSettings() {
+    endEditing();
     showContainer("settings-container");
 }
 
@@ -513,36 +520,6 @@ let defaultRoutines = [
             }
         ]
     },
-    {
-        "id": "91edee8c-6f17-411c-8c43-40680556405g",
-        "title": "RKC minimum",
-        "rounds": 10,
-        "sets": [
-            {"setName": "Go",
-             "intervals": [
-                 {"duration": 60,
-                  "type": "active"},
-                 {"duration": 0,
-                  "type": "rest"}
-             ]
-            }
-        ]
-    },
-    {
-        "id": "91edee8c-6f17-411c-8c43-40680556405h",
-        "title": "30 seconds on 30 seconds off",
-        "rounds": 20,
-        "sets": [
-            {"setName": "Go",
-             "intervals": [
-                 {"duration": 30,
-                  "type": "active"},
-                 {"duration": 30,
-                  "type": "rest"}
-             ]
-            }
-        ]
-    },
   {
     "id": "1ff46c73-0e96-4505-9f93-5f0279c2e78c",
     "title": "Bodyweight tabata",
@@ -601,7 +578,37 @@ let defaultRoutines = [
         ]
       }
     ]
-  }
+  },
+    {
+        "id": "91edee8c-6f17-411c-8c43-40680556405g",
+        "title": "RKC minimum",
+        "rounds": 10,
+        "sets": [
+            {"setName": "Go",
+             "intervals": [
+                 {"duration": 60,
+                  "type": "active"},
+                 {"duration": 0,
+                  "type": "rest"}
+             ]
+            }
+        ]
+    },
+    {
+        "id": "91edee8c-6f17-411c-8c43-40680556405h",
+        "title": "30 seconds on 30 seconds off",
+        "rounds": 20,
+        "sets": [
+            {"setName": "Go",
+             "intervals": [
+                 {"duration": 30,
+                  "type": "active"},
+                 {"duration": 30,
+                  "type": "rest"}
+             ]
+            }
+        ]
+    }
 ];
 
 let routines = [];
@@ -705,7 +712,7 @@ function deleteRoutine(routineNumber) {
 }
 
 function importRoutines() {
-
+    endEditing();
     showContainer("import-container", "flex");
 }
 
