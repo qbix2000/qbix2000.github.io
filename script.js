@@ -572,7 +572,7 @@ let defaultRoutines = [
             "type": "active"
           },
           {
-            "duration": 15,
+            "duration": 60,
             "type": "rest"
           }
         ]
