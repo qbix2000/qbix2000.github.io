@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Isometric</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="./scripts/script.js"></script>  
+</head>
+<body>
+    <div class="container">
+        <!-- Top 1/4 section -->
+        <div class="top-section">
+            <button class="nav-btn prev-btn" aria-label="Previous">&lt;</button>
+            <div class="header-box">
+                <bluetooth-icon id="header-bt"></bluetooth-icon>
+                <div class="value-display">
+                    <span id="weight-display" class="number">0</span>
+                    <span class="unit">kg</span>
+                </div>
+            </div>
+            <button class="nav-btn next-btn" aria-label="Next">&gt;</button>
+        </div>
+
+        <!-- Remaining 3/4 content area -->
+        <div class="content-section">
+            <input id="weight-range" type="range" min="0" max="999.9" style="width:100%" value="0" onInput="updateWeight();" />
+            
+            <div class="input">
+                <button
+                    class="nav-btn prev-btn"
+                    aria-label="Decrease weight"
+                    onmousedown="startHolding(-1, 'target-weight');"
+                    onmouseup="stopHolding();"
+                    onmouseleave="stopHolding();"
+                    ontouchstart="startHolding(-1, 'target-weight');"
+                    ontouchend="stopHolding();"
+                >-</button>
+                <div class="display-box">
+                    <div class="value-display">
+                        <input 
+                          id="target-weight" 
+                          type="number" 
+                          class="number" 
+                          value="0" 
+                          min="0" 
+                          max="999.9" 
+                          step="1"
+                          aria-label="target weight"
+                        />
+                        <span class="unit">kg</span>
+                    </div>
+                </div>
+                <button
+                    class="nav-btn next-btn"
+                    aria-label="Increase weight"
+                    onmousedown="startHolding(1, 'target-weight');"
+                    onmouseup="stopHolding();"
+                    onmouseleave="stopHolding();"
+                    ontouchstart="startHolding(1, 'target-weight');"
+                    ontouchend="stopHolding();"
+                >+</button>
+            </div>
+
+            <div class="input">
+                <button
+                    class="nav-btn prev-btn"
+                    aria-label="Decrease time"
+                    onmousedown="startHolding(-1, 'time-input');"
+                    onmouseup="stopHolding();"
+                    onmouseleave="stopHolding();"
+                    ontouchstart="startHolding(-1, 'time-input');"
+                    ontouchend="stopHolding();"
+                >-</button>
+                <div class="display-box">
+                    <div class="value-display">
+                        <input 
+                          id="time-input" 
+                          type="number" 
+                          class="number" 
+                          value="6" 
+                          min="0" 
+                          max="99" 
+                          step="1"
+                          aria-label="Time input"
+                        />
+                        <span class="unit">s</span>
+                    </div>
+                </div>
+                <button
+                    class="nav-btn next-btn"
+                    aria-label="Increase time"
+                    onmousedown="startHolding(1, 'time-input');"
+                    onmouseup="stopHolding();"
+                    onmouseleave="stopHolding();"
+                    ontouchstart="startHolding(1, 'time-input');"
+                    ontouchend="stopHolding();"
+                >+</button>
+            </div>
+            <button class="bt-btn" aria-label="Connect Bluetooth" onClick="connectBluetooth();">
+                <bluetooth-icon id="bt-action"></bluetooth-icon>
+            </button>
+        </div>
+    </div>
+</body>
+</html>
