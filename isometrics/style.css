@@ -1,0 +1,190 @@
+/* Universal reset */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  width: 100vw;
+  height: 100dvh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #0f0f11;
+  overflow: hidden;
+
+  /* Safe Area Insets for iPhones with notched/dynamic island displays */
+  padding-top: max(8px, env(safe-area-inset-top));
+  padding-bottom: max(8px, env(safe-area-inset-bottom));
+  padding-left: max(8px, env(safe-area-inset-left));
+  padding-right: max(8px, env(safe-area-inset-right));
+}
+
+/* App Main Container */
+.container {
+  width: 100%;
+  height: 100%; /* Expands full available vertical height */
+  max-width: 480px; /* Limits desktop width */
+  
+  border: 1px solid #ffffff; 
+  border-radius: 12px;
+  
+  display: flex;
+  flex-direction: column;
+  background-color: #0f0f11;
+  overflow: hidden;
+}
+
+/* Top 1/4 section */
+.top-section {
+  flex: 0 0 25%; /* Fixed 25% height */
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  padding: 8px;
+}
+
+/* Header box between buttons */
+.header-box {
+  position: relative;
+  flex: 0 0 80%;
+  min-width: 80%;
+  border: 1px solid #ffffff;
+  container-type: size;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Bluetooth Icon */
+bluetooth-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative; /* Normal document flow */
+}
+
+/* Internal SVG */
+bluetooth-icon .bt-svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  stroke: #ffffff;
+}
+
+/* Flashing Animation targeting class on the custom element or SVG */
+.header-box bluetooth-icon:not(.connected) .bt-svg {
+  animation: bluetoothFlash 2s infinite steps(1, start);
+}
+
+@keyframes bluetoothFlash {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Overrides ONLY for the icon inside .header-box */
+.header-box bluetooth-icon {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+}
+
+/* Styling for standalone button wrapper */
+.bt-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  background: transparent;
+  border: 1px solid #ffffff;
+  cursor: pointer;
+}
+
+/* Main content area taking remaining 75% height */
+.content-section {
+  flex: 1; /* Fills remaining 75% of screen */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly; /* Evenly spaces elements vertically */
+  gap: 12px;
+  padding: 12px 8px;
+}
+
+/* Input row styling */
+.input {
+  height: 25%;
+  min-height: 60px;
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+
+/* Display Box (Middle container) */
+.display-box {
+  flex: 0 0 80%;
+  min-width: 80%;
+  border: 1px solid #ffffff;
+  container-type: size;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Value Display Typography */
+.value-display {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.25rem;
+  color: #ffffff;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.value-display input.number {
+  font-size: clamp(1.5rem, 50cqh, 10vw);
+  font-family: inherit;
+  font-weight: inherit;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  background: transparent;
+  border: none;
+  outline: none;
+  text-align: right;
+  width: 4.2ch; 
+  padding: 0;
+  margin: 0;
+  height: 100%;
+}
+
+.value-display .number {
+  font-size: clamp(1.5rem, 55cqh, 12vw); 
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.value-display .unit {
+  font-size: 2em; 
+  font-weight: 500;
+  opacity: 0.85;
+}
+
+/* Nav Buttons */
+.nav-btn {
+  flex: 1;
+  height: 100%;
+  border: 1px solid #ffffff;
+  background: transparent;
+  color: #ffffff;
+  font-size: 1.25rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
