@@ -11,7 +11,6 @@
     <div class="container">
         <!-- Top 1/4 section -->
         <div class="top-section">
-            <button class="nav-btn prev-btn" aria-label="Previous">&lt;</button>
             <div class="header-box">
                 <bluetooth-icon id="header-bt"></bluetooth-icon>
                 <div class="value-display">
@@ -19,13 +18,22 @@
                     <span class="unit">kg</span>
                 </div>
             </div>
-            <button class="nav-btn next-btn" aria-label="Next">&gt;</button>
         </div>
 
         <!-- Remaining 3/4 content area -->
         <div class="content-section">
-            <input id="weight-range" type="range" min="0" max="999.9" style="width:100%" value="0" onInput="updateWeight();" />
-            
+            <input id="weight-range" hidden type="range" min="0" max="999.9" style="width:100%;" value="0" onInput="updateWeight();" />
+            <div class="peak-container">
+              <div class="peak-card">
+                <span class="peak-label">PEAK WEIGHT</span>
+                <div class="peak-value-group">
+                  <span id="set-peak-display">0.00</span><span class="unit">kg</span>
+                </div>
+              </div>
+              <button id="reset-peak-btn" onclick="resetPeakWeight()" aria-label="Reset peak weight">
+                Clear
+              </button>
+            </div>            
             <div class="input">
                 <button
                     class="nav-btn prev-btn"
