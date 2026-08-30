@@ -12,6 +12,8 @@ body {
   justify-content: center;
   align-items: center;
   background-color: #0f0f11;
+  color: #e1e3e8;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   overflow: hidden;
 
   /* Safe Area Insets for iPhones with notched/dynamic island displays */
@@ -27,18 +29,19 @@ body {
   height: 100%; /* Expands full available vertical height */
   max-width: 480px; /* Limits desktop width */
   
-  border: 1px solid #ffffff; 
-  border-radius: 12px;
+  border: 1px solid #2a2d34; 
+  border-radius: 16px;
   
   display: flex;
   flex-direction: column;
   background-color: #0f0f11;
   overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
 }
 
-/* Top 1/4 section */
+/* Top 1/3 section */
 .top-section {
-  flex: 0 0 25%; /* Fixed 25% height */
+  flex: 0 0 30%; /* Fixed height ratio */
   display: flex;
   align-items: stretch;
   gap: 8px;
@@ -48,9 +51,11 @@ body {
 /* Header box between buttons */
 .header-box {
   position: relative;
-  flex: 0 0 80%;
-  min-width: 80%;
-  border: 1px solid #ffffff;
+  flex: 0 0 100%;
+  min-width: 100%;
+  background-color: #18191c;
+  border: 1px solid #2a2d34;
+  border-radius: 12px;
   container-type: size;
   display: flex;
   align-items: center;
@@ -70,7 +75,14 @@ bluetooth-icon {
 bluetooth-icon .bt-svg {
   width: 1.5rem;
   height: 1.5rem;
-  stroke: #ffffff;
+  stroke: #8a8f9d;
+  transition: stroke 0.2s ease;
+}
+
+/* Connected state icon glow */
+bluetooth-icon.connected .bt-svg {
+  stroke: #00ff88;
+  filter: drop-shadow(0 0 6px rgba(0, 255, 136, 0.4));
 }
 
 /* Flashing Animation targeting class on the custom element or SVG */
@@ -80,30 +92,44 @@ bluetooth-icon .bt-svg {
 
 @keyframes bluetoothFlash {
   0% { opacity: 1; }
-  50% { opacity: 0; }
+  50% { opacity: 0.2; }
 }
 
 /* Overrides ONLY for the icon inside .header-box */
 .header-box bluetooth-icon {
   position: absolute;
-  top: 8px;
-  left: 8px;
+  top: 12px;
+  left: 12px;
 }
 
 /* Styling for standalone button wrapper */
 .bt-btn {
   display: flex;
+  height: 10%;
   align-items: center;
   justify-content: center;
   padding: 8px;
-  background: transparent;
-  border: 1px solid #ffffff;
+  background-color: #24272e;
+  border: 1px solid #3a3f4d;
+  border-radius: 8px;
   cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* Main content area taking remaining 75% height */
+.bt-btn:hover {
+  background-color: #2f343f;
+  border-color: #4a5061;
+}
+
+.bt-btn:active {
+  transform: scale(0.96);
+}
+
+/* Main content area taking remaining height */
 .content-section {
-  flex: 1; /* Fills remaining 75% of screen */
+  flex: 1; /* Fills remaining height of screen */
   display: flex;
   flex-direction: column;
   justify-content: space-evenly; /* Evenly spaces elements vertically */
@@ -124,7 +150,9 @@ bluetooth-icon .bt-svg {
 .display-box {
   flex: 0 0 80%;
   min-width: 80%;
-  border: 1px solid #ffffff;
+  background-color: #18191c;
+  border: 1px solid #2a2d34;
+  border-radius: 12px;
   container-type: size;
   display: flex;
   align-items: center;
@@ -138,7 +166,7 @@ bluetooth-icon .bt-svg {
   align-items: baseline;
   gap: 0.25rem;
   color: #ffffff;
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: 'Chakra Petch', system-ui, -apple-system, sans-serif;
   font-weight: 700;
   line-height: 1;
 }
@@ -167,24 +195,119 @@ bluetooth-icon .bt-svg {
 
 .value-display .unit {
   font-size: 2em; 
-  font-weight: 500;
-  opacity: 0.85;
+  font-weight: 600;
+  color: #626875;
 }
 
 /* Nav Buttons */
 .nav-btn {
   flex: 1;
   height: 100%;
-  border: 1px solid #ffffff;
-  background: transparent;
-  color: #ffffff;
+  background-color: #24272e;
+  border: 1px solid #3a3f4d;
+  border-radius: 12px;
+  color: #e1e3e8;
   font-size: 1.25rem;
+  font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.15s ease-in-out;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .nav-btn:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: #2f343f;
+  border-color: #4a5061;
+  color: #ffffff;
+}
+
+.nav-btn:active {
+  transform: scale(0.96);
+  background-color: #3a3f4d;
+}
+
+/* Peak Weight Container layout */
+.peak-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #18191c;
+  border: 1px solid #2a2d34;
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin: 0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* Peak Value Card */
+.peak-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.peak-label {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: #8a8f9d;
+  text-transform: uppercase;
+}
+
+.peak-value-group {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+#set-peak-display {
+  font-family: 'Chakra Petch', system-ui, monospace, sans-serif;
+  font-size: 5.25rem;
+  font-weight: 700;
+  color: #00ff88; /* High-contrast neon green accent */
+  text-shadow: 0 0 12px rgba(0, 255, 136, 0.25);
+  line-height: 1;
+}
+
+.peak-value-group .unit {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #626875;
+}
+
+/* Clear / Reset Button */
+#reset-peak-btn {
+  background-color: #24272e;
+  color: #e1e3e8;
+  border: 1px solid #3a3f4d;
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  min-height: 48px;
+  min-width: 80px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Active / Tap Feedback */
+#reset-peak-btn:hover {
+  background-color: #2f343f;
+  border-color: #4a5061;
+  color: #ffffff;
+}
+
+#reset-peak-btn:active {
+  transform: scale(0.96);
+  background-color: #ff3b30; /* Danger accent flash on press */
+  border-color: #ff3b30;
+  color: #ffffff;
 }
