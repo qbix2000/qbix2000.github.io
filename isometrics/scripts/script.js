@@ -1,10 +1,8 @@
 let isSetRunning = false;
 let isSetComplete = false;
-
-// Audio Context setup
 let audioCtx = null;
-
 let targetDuration = 6;
+let currentPeakWeight = 0;
 
 function updateWeight() {
   let slider = document.getElementById("weight-range");
@@ -13,6 +11,7 @@ function updateWeight() {
   weightDisplay.innerHTML = slider.value;
 
   checkWeightThreshold(slider.value);
+  trackPeakWeight(parseFloat(slider.value));
 }
 
 
@@ -174,6 +173,28 @@ function adjustAmount(amount, inputId) {
   }
 }
 
+function trackPeakWeight(liveWeight) {
+  // Only update if the current live pull exceeds our recorded peak
+  liveWeight = parseFloat(liveWeight);
+  if (liveWeight > currentPeakWeight) {
+    currentPeakWeight = liveWeight;
+    
+    const setPeakDisplay = document.getElementById("set-peak-display");
+    if (setPeakDisplay) {
+      setPeakDisplay.textContent = currentPeakWeight.toFixed(2);
+    }
+  }
+}
+
+function resetPeakWeight() {
+  currentPeakWeight = 0;
+  const setPeakDisplay = document.getElementById("set-peak-display");
+  if (setPeakDisplay) {
+    setPeakDisplay.textContent = "0.00";
+  }
+  console.log("Peak weight manually reset.");
+}
+
 // Web Bluetooth Handler
 async function connectBluetooth() {
   const headerBtIcon = document.getElementById("header-bt");
@@ -205,6 +226,7 @@ async function connectBluetooth() {
             if (!isNaN(weightKg) && weightDisplay) {
               weightDisplay.textContent = weightKg;
               checkWeightThreshold(parseFloat(weightKg));
+              trackPeakWeight(weightKg);
             }
           }
         });
