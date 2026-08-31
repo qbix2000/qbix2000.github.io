@@ -51,8 +51,8 @@ body {
 
 /* Display Box (Middle container for Live Weight & Timer) */
 .display-box {
-  flex: 1 0 70%;
-  min-width: 0;
+  flex: 1 1 auto; /* Allow box to grow and shrink dynamically between buttons */
+  min-width: 0;   /* CRITICAL: Allows container to shrink below text content width */
   min-height: 80px;
   background-color: #18191c;
   border: 1px solid #2a2d34;
@@ -93,8 +93,8 @@ body {
 
 /* Scaled up input field (Target Weight / Time settings) */
 .value-display input.number {
-  /* Scaled up input field to match main display scale */
-  font-size: 5.25rem;
+  /* Use fluid clamp instead of fixed 5.25rem so 3-digit numbers scale down on narrow phones */
+  font-size: clamp(4rem, 12vw, 5.25rem);
   font-family: inherit;
   font-weight: inherit;
   color: #ffffff;
@@ -103,7 +103,9 @@ body {
   border: none;
   outline: none;
   text-align: right;
-  width: 4.5ch; 
+  width: 100%;
+  max-width: 3.5ch; /* Reduced from 4.5ch to prevent pushing buttons off-screen */
+  min-width: 0;     /* Allows text box to fit snug inside flex container */
   padding: 0;
   margin: 0;
 }
