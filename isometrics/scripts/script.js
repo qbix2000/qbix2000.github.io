@@ -244,6 +244,11 @@ function adjustAmount(amount, inputId) {
   } else {
     display.textContent = newVal.toFixed(0);
   }
+
+  // Mobile Haptic Feedback (Vibrates mobile devices on tap)
+  if ("vibrate" in navigator) {
+    navigator.vibrate(12);
+  }
 }
 
 // Call event binding once DOM is ready
@@ -308,3 +313,55 @@ class BluetoothIcon extends HTMLElement {
 }
 
 customElements.define("bluetooth-icon", BluetoothIcon);
+
+let wakeLock = null;
+
+// Call this inside your Bluetooth Connect button handler
+async function requestWakeLock() {
+  try {
+    if ('wakeLock' in navigator) {
+      wakeLock = await navigator.wakeLock.request('screen');
+      console.log('Screen Wake Lock active');
+
+      // Re-apply if the user switches tabs and comes back
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+    }
+  } catch (err) {
+    console.error(`Wake Lock error: ${err.name}, ${err.message}`);
+  }
+}
+
+// Call this when Bluetooth disconnects
+function releaseWakeLock() {
+  if (wakeLock !== null) {
+    wakeLock.release().then(() => {
+      wakeLock = null;
+      console.log('Screen Wake Lock released');
+    });
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }
+}
+
+// Re-aquire wake lock if app regains focus while Bluetooth is still connected
+async function handleVisibilityChange() {
+  if (wakeLock !== null && document.visibilityState === 'visible') {
+    await requestWakeLock();
+  }
+}
+
+connectBluetoothBtn.addEventListener('click', async () => {
+  try {
+    // 1. Request Bluetooth Device...
+    // const device = await navigator.bluetooth.requestDevice(...);
+    // await device.gatt.connect();
+
+    // 2. Activate Wake Lock upon successful connection tap
+    await requestWakeLock();
+
+    // 3. Listen for Bluetooth disconnection to clean up
+    // device.addEventListener('gattserverdisconnected', releaseWakeLock);
+
+  } catch (error) {
+    console.log('Connection failed or cancelled', error);
+  }
+});
