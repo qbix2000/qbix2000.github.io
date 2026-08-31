@@ -51,8 +51,8 @@ body {
 
 /* Display Box (Middle container for Live Weight & Timer) */
 .display-box {
-  flex: 0 0 80%;
-  min-width: 80%;
+  flex: 1 0 70%;
+  min-width: 0;
   min-height: 80px;
   background-color: #18191c;
   border: 1px solid #2a2d34;
@@ -239,21 +239,26 @@ bluetooth-icon.connected .bt-svg {
 
 /* Nav Buttons */
 .nav-btn {
-  flex: 1;
-  height: 100%;
+  flex: 0 0 64px; /* Ensured generous touch width on mobile */
+  min-height: 56px;
   background-color: #24272e;
   border: 1px solid #3a3f4d;
   border-radius: 12px;
   color: #e1e3e8;
-  font-size: 1.25rem;
-  font-weight: 600;
+  font-size: 1.75rem; /* Larger + and - glyphs */
+  font-weight: 700;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.15s ease-in-out;
+  
+  /* Touch UX Protections */
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+  
+  transition: transform 0.1s ease, background-color 0.15s ease, border-color 0.15s ease;
 }
 
 .nav-btn:hover {
@@ -263,10 +268,11 @@ bluetooth-icon.connected .bt-svg {
 }
 
 .nav-btn:active {
-  transform: scale(0.96);
-  background-color: #3a3f4d;
+  transform: scale(0.93);
+  background-color: #2f343f;
+  border-color: #00ff88; /* Neon border flash on press */
+  color: #ffffff;
 }
-
 
 /* Peak Value Card */
 .peak-card {
