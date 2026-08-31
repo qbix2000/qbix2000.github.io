@@ -48,20 +48,111 @@ body {
   padding: 8px;
 }
 
-/* Header box between buttons */
-.header-box {
-  position: relative;
-  flex: 0 0 100%;
-  min-width: 100%;
+
+/* Display Box (Middle container for Live Weight & Timer) */
+.display-box {
+  flex: 0 0 80%;
+  min-width: 80%;
+  min-height: 80px;
   background-color: #18191c;
   border: 1px solid #2a2d34;
   border-radius: 12px;
-  container-type: size;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
 }
+
+/* Header box between buttons */
+.header-box {
+  position: relative;
+  flex: 0 0 100%;
+  min-width: 100%;
+  min-height: 90px;
+  background-color: #18191c;
+  border: 1px solid #2a2d34;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Value Display Typography (Live Weight & Main Timer) */
+.value-display {
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.25rem;
+  color: #ffffff;
+  font-family: 'Chakra Petch', system-ui, -apple-system, sans-serif;
+  font-weight: 700;
+  line-height: 1;
+  width: 100%;
+}
+
+/* Scaled up input field (Target Weight / Time settings) */
+.value-display input.number {
+  /* Scaled up input field to match main display scale */
+  font-size: 5.25rem;
+  font-family: inherit;
+  font-weight: inherit;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  background: transparent;
+  border: none;
+  outline: none;
+  text-align: right;
+  width: 4.5ch; 
+  padding: 0;
+  margin: 0;
+}
+
+/* Main Live Display (Weight numbers & Timer countdowns) */
+.value-display .number {
+  /* Fixed large rem base with viewport fallback */
+  font-size: 8.25rem;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+}
+
+/* Display Units (kg, sec, etc.) */
+.value-display .unit {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #626875;
+}
+
+/* Updated Peak Display matching your requested size */
+#set-peak-display {
+  font-family: 'Chakra Petch', system-ui, monospace, sans-serif;
+  font-size: 5.25rem;
+  font-weight: 700;
+  color: #00ff88;
+  text-shadow: 0 0 16px rgba(0, 255, 136, 0.3);
+  line-height: 1;
+}
+
+/* Layout adjustment to keep Peak Card balanced at 5.25rem */
+.peak-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #18191c;
+  border: 1px solid #2a2d34;
+  border-radius: 12px;
+  padding: 12px 20px;
+  margin: 0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.peak-value-group .unit {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #626875;
+}
+
 
 /* Bluetooth Icon */
 bluetooth-icon {
@@ -139,64 +230,11 @@ bluetooth-icon.connected .bt-svg {
 
 /* Input row styling */
 .input {
-  height: 25%;
-  min-height: 60px;
+  height: 28%;
+  min-height: 80px; /* Increased to ensure inputs don't clip large text */
   display: flex;
   align-items: stretch;
   gap: 8px;
-}
-
-/* Display Box (Middle container) */
-.display-box {
-  flex: 0 0 80%;
-  min-width: 80%;
-  background-color: #18191c;
-  border: 1px solid #2a2d34;
-  border-radius: 12px;
-  container-type: size;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-/* Value Display Typography */
-.value-display {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 0.25rem;
-  color: #ffffff;
-  font-family: 'Chakra Petch', system-ui, -apple-system, sans-serif;
-  font-weight: 700;
-  line-height: 1;
-}
-
-.value-display input.number {
-  font-size: clamp(1.5rem, 50cqh, 10vw);
-  font-family: inherit;
-  font-weight: inherit;
-  color: #ffffff;
-  letter-spacing: -0.02em;
-  background: transparent;
-  border: none;
-  outline: none;
-  text-align: right;
-  width: 4.2ch; 
-  padding: 0;
-  margin: 0;
-  height: 100%;
-}
-
-.value-display .number {
-  font-size: clamp(1.5rem, 55cqh, 12vw); 
-  line-height: 1;
-  letter-spacing: -0.02em;
-}
-
-.value-display .unit {
-  font-size: 2em; 
-  font-weight: 600;
-  color: #626875;
 }
 
 /* Nav Buttons */
@@ -229,18 +267,6 @@ bluetooth-icon.connected .bt-svg {
   background-color: #3a3f4d;
 }
 
-/* Peak Weight Container layout */
-.peak-container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background-color: #18191c;
-  border: 1px solid #2a2d34;
-  border-radius: 12px;
-  padding: 16px 20px;
-  margin: 0;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-}
 
 /* Peak Value Card */
 .peak-card {
@@ -262,21 +288,6 @@ bluetooth-icon.connected .bt-svg {
   display: flex;
   align-items: baseline;
   gap: 6px;
-}
-
-#set-peak-display {
-  font-family: 'Chakra Petch', system-ui, monospace, sans-serif;
-  font-size: 5.25rem;
-  font-weight: 700;
-  color: #00ff88; /* High-contrast neon green accent */
-  text-shadow: 0 0 12px rgba(0, 255, 136, 0.25);
-  line-height: 1;
-}
-
-.peak-value-group .unit {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #626875;
 }
 
 /* Clear / Reset Button */
