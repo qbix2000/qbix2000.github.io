@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -23,12 +22,12 @@
 
         <!-- Remaining 3/4 content area -->
         <div class="content-section">
-            <input id="weight-range" hidden type="range" min="0" max="999.9" style="width:100%;" value="0" onInput="updateWeight();" />
+            <input id="weight-range" type="range" min="0" max="999.9" style="width:100%;" value="0" onInput="updateWeight();" />
             <div class="peak-container">
               <div class="peak-card">
                 <span class="peak-label">PEAK WEIGHT</span>
                 <div class="peak-value-group">
-                  <span id="set-peak-display">0.00</span><span class="unit">kg</span>
+                  <span id="set-peak-display">0.0</span><span class="unit">kg</span>
                 </div>
               </div>
               <button id="reset-peak-btn" onclick="resetPeakWeight()" aria-label="Reset peak weight">
@@ -36,75 +35,24 @@
               </button>
             </div>            
             <div class="input">
-                <button
-                    class="nav-btn prev-btn"
-                    aria-label="Decrease weight"
-                    onmousedown="startHolding(-1, 'target-weight');"
-                    onmouseup="stopHolding();"
-                    onmouseleave="stopHolding();"
-                    ontouchstart="startHolding(-1, 'target-weight');"
-                    ontouchend="stopHolding();"
-                >-</button>
+                <button class="nav-btn" data-input-id="target-weight">-</button>
                 <div class="display-box">
                     <div class="value-display">
-                        <input 
-                          id="target-weight" 
-                          type="number" 
-                          class="number" 
-                          value="0" 
-                          min="0" 
-                          max="999.9" 
-                          step="1"
-                          aria-label="target weight"
-                        />
+                        <input type="number" id="target-weight" class="number" value="30" min="0" max="500" />
                         <span class="unit">kg</span>
                     </div>
                 </div>
-                <button
-                    class="nav-btn next-btn"
-                    aria-label="Increase weight"
-                    onmousedown="startHolding(1, 'target-weight');"
-                    onmouseup="stopHolding();"
-                    onmouseleave="stopHolding();"
-                    ontouchstart="startHolding(1, 'target-weight');"
-                    ontouchend="stopHolding();"
-                >+</button>
+                <button class="nav-btn" data-input-id="target-weight">+</button>
             </div>
-
             <div class="input">
-                <button
-                    class="nav-btn prev-btn"
-                    aria-label="Decrease time"
-                    onmousedown="startHolding(-1, 'time-input');"
-                    onmouseup="stopHolding();"
-                    onmouseleave="stopHolding();"
-                    ontouchstart="startHolding(-1, 'time-input');"
-                    ontouchend="stopHolding();"
-                >-</button>
+                <button class="nav-btn" data-input-id="time-input">-</button>
                 <div class="display-box">
                     <div class="value-display">
-                        <input 
-                          id="time-input" 
-                          type="number" 
-                          class="number" 
-                          value="6" 
-                          min="0" 
-                          max="99" 
-                          step="1"
-                          aria-label="Time input"
-                        />
+                        <input type="number" id="time-input" class="number" value="6" min="0" max="99" />
                         <span class="unit">s</span>
                     </div>
                 </div>
-                <button
-                    class="nav-btn next-btn"
-                    aria-label="Increase time"
-                    onmousedown="startHolding(1, 'time-input');"
-                    onmouseup="stopHolding();"
-                    onmouseleave="stopHolding();"
-                    ontouchstart="startHolding(1, 'time-input');"
-                    ontouchend="stopHolding();"
-                >+</button>
+                <button class="nav-btn" data-input-id="time-input">+</button>
             </div>
             <button class="bt-btn" aria-label="Connect Bluetooth" onClick="connectBluetooth();">
                 <bluetooth-icon id="bt-action"></bluetooth-icon>
