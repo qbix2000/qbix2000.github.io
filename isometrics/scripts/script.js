@@ -141,23 +141,6 @@ function checkWeightThreshold(currentWeightKg) {
 let holdTimer = null;
 let holdInterval = null;
 
-function adjustAmount(amount, inputId) {
-  const display = document.getElementById(inputId);
-  if (!display) return;
-
-  const max = parseFloat(display.max) || 999;
-  const min = parseFloat(display.min) || 0;
-
-  let currentVal = parseFloat(display.value || display.textContent) || min;
-  let newVal = Math.min(Math.max(currentVal + amount, min), max);
-
-  if (display.tagName === "INPUT") {
-    display.value = newVal.toFixed(0);
-  } else {
-    display.textContent = newVal.toFixed(0);
-  }
-}
-
 function trackPeakWeight(liveWeight) {
   // Only update if the current live pull exceeds our recorded peak
   liveWeight = parseFloat(liveWeight);
@@ -255,51 +238,102 @@ function adjustAmount(amount, inputId) {
 document.addEventListener('DOMContentLoaded', attachStepperEvents);
 
 // Web Bluetooth Handler
+// State & Timeout references
+let device = null;
+let advertisementTimeout = null;
+const ADVERTISEMENT_TIMEOUT_MS = 300000;
+
 async function connectBluetooth() {
   const headerBtIcon = document.getElementById("header-bt");
   const actionBtIcon = document.getElementById("bt-action");
-  const weightDisplay = document.getElementById("weight-display");
 
   try {
     const companyIds = Array.from({ length: 0x0300 }, (_, i) => i);
 
-    const device = await navigator.bluetooth.requestDevice({
+    // 1. Request device filtering by prefix
+    device = await navigator.bluetooth.requestDevice({
       filters: [{ namePrefix: 'IF_B7' }],
       optionalManufacturerData: companyIds
     });
 
+    // 2. Attach single advertisement listener
+    device.addEventListener('advertisementreceived', handleAdvertisement);
+
+    // 3. Start watching advertisement packets
     await device.watchAdvertisements();
 
-    if (headerBtIcon) headerBtIcon.classList.add("connected");
-    if (actionBtIcon) actionBtIcon.classList.add("connected");
+    // 4. Update UI & request screen lock
+    setBluetoothUIState(true);
+    await requestWakeLock();
 
-    const handleAdv = (event) => {
-      if (event.manufacturerData && event.manufacturerData.size > 0) {
-        event.manufacturerData.forEach((dataView) => {
-          const bytes = new Uint8Array(dataView.buffer, dataView.byteOffset, dataView.byteLength);
-
-          if (bytes.length >= 12) {
-            const rawWeight = (bytes[10] << 8) | bytes[11];
-            const weightKg = (rawWeight / 105.3).toFixed(1);
-
-            if (!isNaN(weightKg) && weightDisplay) {
-              weightDisplay.textContent = weightKg;
-              checkWeightThreshold(parseFloat(weightKg));
-              trackPeakWeight(weightKg);
-            }
-          }
-        });
-      }
-    };
-
-    device.addEventListener('advertisementreceived', handleAdv);
-    navigator.bluetooth.addEventListener('advertisementreceived', handleAdv);
+    // 5. Start timeout countdown waiting for first packet
+    resetAdvertisementTimeout();
 
   } catch (error) {
     console.error("Bluetooth connection error:", error);
-    if (headerBtIcon) headerBtIcon.classList.remove("connected");
-    if (actionBtIcon) actionBtIcon.classList.remove("connected");
+    setBluetoothUIState(false);
   }
+}
+
+// Separate packet processing handler
+function handleAdvertisement(event) {
+  // Packet received — push back disconnection timer
+  resetAdvertisementTimeout();
+
+  if (!event.manufacturerData || event.manufacturerData.size === 0) return;
+
+  const weightDisplay = document.getElementById("weight-display");
+
+  event.manufacturerData.forEach((dataView) => {
+    const bytes = new Uint8Array(dataView.buffer, dataView.byteOffset, dataView.byteLength);
+
+    if (bytes.length >= 12) {
+      const rawWeight = (bytes[10] << 8) | bytes[11];
+      const weightKg = (rawWeight / 105.3).toFixed(1);
+
+      if (!isNaN(weightKg) && weightDisplay) {
+        weightDisplay.textContent = weightKg;
+        checkWeightThreshold(parseFloat(weightKg));
+        trackPeakWeight(weightKg);
+      }
+    }
+  });
+}
+
+// Resets watchdog timer on every packet
+function resetAdvertisementTimeout() {
+  if (advertisementTimeout) clearTimeout(advertisementTimeout);
+
+  advertisementTimeout = setTimeout(() => {
+    onBluetoothDisconnected();
+  }, ADVERTISEMENT_TIMEOUT_MS);
+}
+
+// Fires when advertisement stream drops out
+function onBluetoothDisconnected() {
+  console.log("Bluetooth signal lost — no advertisement packets received.");
+  
+  if (advertisementTimeout) clearTimeout(advertisementTimeout);
+  
+  // Clean up device listener if device reference exists
+  if (device) {
+    device.removeEventListener('advertisementreceived', handleAdvertisement);
+  }
+
+  releaseWakeLock();
+  setBluetoothUIState(false);
+}
+
+// Centralized UI toggle
+function setBluetoothUIState(isConnected) {
+  const headerBtIcon = document.getElementById("header-bt");
+  const actionBtIcon = document.getElementById("bt-action");
+
+  [headerBtIcon, actionBtIcon].forEach((icon) => {
+    if (icon) {
+      icon.classList.toggle("connected", isConnected);
+    }
+  });
 }
 
 class BluetoothIcon extends HTMLElement {
@@ -333,6 +367,7 @@ async function requestWakeLock() {
 
 // Call this when Bluetooth disconnects
 function releaseWakeLock() {
+    console.log("requesting wakelock");
   if (wakeLock !== null) {
     wakeLock.release().then(() => {
       wakeLock = null;
@@ -349,19 +384,3 @@ async function handleVisibilityChange() {
   }
 }
 
-connectBluetoothBtn.addEventListener('click', async () => {
-  try {
-    // 1. Request Bluetooth Device...
-    // const device = await navigator.bluetooth.requestDevice(...);
-    // await device.gatt.connect();
-
-    // 2. Activate Wake Lock upon successful connection tap
-    await requestWakeLock();
-
-    // 3. Listen for Bluetooth disconnection to clean up
-    // device.addEventListener('gattserverdisconnected', releaseWakeLock);
-
-  } catch (error) {
-    console.log('Connection failed or cancelled', error);
-  }
-});
