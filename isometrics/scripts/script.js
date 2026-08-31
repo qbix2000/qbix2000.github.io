@@ -4,6 +4,7 @@ let audioCtx = null;
 let targetDuration = 6;
 let currentPeakWeight = 0;
 
+
 function updateWeight() {
   let slider = document.getElementById("weight-range");
   let weightDisplay = document.getElementById("weight-display");
@@ -11,9 +12,8 @@ function updateWeight() {
   weightDisplay.innerHTML = slider.value;
 
   checkWeightThreshold(slider.value);
-  trackPeakWeight(parseFloat(slider.value));
+  trackPeakWeight(parseFloat(slider.value).toFixed(1));
 }
-
 
 function playBeep(frequency = 880, duration = 0.5) {
   if (!audioCtx) {
@@ -141,21 +141,6 @@ function checkWeightThreshold(currentWeightKg) {
 let holdTimer = null;
 let holdInterval = null;
 
-function startHolding(amount, inputId) {
-  adjustAmount(amount, inputId);
-  stopHolding();
-  holdTimer = setTimeout(() => {
-    holdInterval = setInterval(() => {
-      adjustAmount(amount, inputId);
-    }, 100);
-  }, 400);
-}
-
-function stopHolding() {
-  clearTimeout(holdTimer);
-  clearInterval(holdInterval);
-}
-
 function adjustAmount(amount, inputId) {
   const display = document.getElementById(inputId);
   if (!display) return;
@@ -181,7 +166,7 @@ function trackPeakWeight(liveWeight) {
     
     const setPeakDisplay = document.getElementById("set-peak-display");
     if (setPeakDisplay) {
-      setPeakDisplay.textContent = currentPeakWeight.toFixed(2);
+      setPeakDisplay.textContent = currentPeakWeight.toFixed(1);
     }
   }
 }
@@ -194,6 +179,75 @@ function resetPeakWeight() {
   }
   console.log("Peak weight manually reset.");
 }
+
+function attachStepperEvents() {
+  const buttons = document.querySelectorAll('.nav-btn');
+
+  buttons.forEach(btn => {
+    // Determine step amount (+1 or -1) based on button content or data attribute
+    const isIncrement = btn.textContent.includes('+');
+    const inputId = btn.getAttribute('data-input-id') || (btn.closest('.input')?.querySelector('input')?.id);
+    const amount = isIncrement ? 1 : -1;
+
+    // Remove old inline handlers if present and use unified Pointer Events
+    btn.onmousedown = null;
+    btn.ontouchstart = null;
+
+    btn.addEventListener('pointerdown', (e) => {
+      // Prevent double triggers and default scrolling gestures while holding buttons
+      e.preventDefault();
+      
+      // Execute first tap increment immediately
+      adjustAmount(amount, inputId);
+
+      // Clear any leftover timers
+      stopHolding();
+
+      // Start hold-to-repeat delay (400ms delay, then repeat every 100ms)
+      holdTimer = setTimeout(() => {
+        holdInterval = setInterval(() => {
+          adjustAmount(amount, inputId);
+        }, 100);
+      }, 400);
+    });
+
+    // Stop incrementing on pointer release, cancel, or when finger leaves button bounds
+    btn.addEventListener('pointerup', stopHolding);
+    btn.addEventListener('pointercancel', stopHolding);
+    btn.addEventListener('pointerleave', stopHolding);
+  });
+}
+
+function stopHolding() {
+  if (holdTimer) {
+    clearTimeout(holdTimer);
+    holdTimer = null;
+  }
+  if (holdInterval) {
+    clearInterval(holdInterval);
+    holdInterval = null;
+  }
+}
+
+function adjustAmount(amount, inputId) {
+  const display = document.getElementById(inputId);
+  if (!display) return;
+
+  const max = parseFloat(display.max) || 999;
+  const min = parseFloat(display.min) || 0;
+
+  let currentVal = parseFloat(display.value || display.textContent) || min;
+  let newVal = Math.min(Math.max(currentVal + amount, min), max);
+
+  if (display.tagName === "INPUT") {
+    display.value = newVal.toFixed(0);
+  } else {
+    display.textContent = newVal.toFixed(0);
+  }
+}
+
+// Call event binding once DOM is ready
+document.addEventListener('DOMContentLoaded', attachStepperEvents);
 
 // Web Bluetooth Handler
 async function connectBluetooth() {
@@ -221,7 +275,7 @@ async function connectBluetooth() {
 
           if (bytes.length >= 12) {
             const rawWeight = (bytes[10] << 8) | bytes[11];
-            const weightKg = (rawWeight / 105.3).toFixed(2);
+            const weightKg = (rawWeight / 105.3).toFixed(1);
 
             if (!isNaN(weightKg) && weightDisplay) {
               weightDisplay.textContent = weightKg;
